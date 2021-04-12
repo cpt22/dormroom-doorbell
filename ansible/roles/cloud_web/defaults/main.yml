@@ -2,10 +2,10 @@
 # vars file for cloud_web
 
 # variables for chapter 05
-connected_devices_git_repo_url: "git@github.com:CWRU-Connected-Devices/connected-devices-spring21.git"
-repo_directory: /home/ubuntu/connected-devices
+connected_devices_git_repo_url: "git@github.com:cpt22/lampi-ecosystem.git"
+repo_directory: /home/ubuntu/lampi-ecosystem
 connected_devices_git_repo_version: master
-root_web_directory: /home/ubuntu/connected-devices/Web/static
+root_web_directory: /home/ubuntu/lampi-ecosystem/Web/static
 
 # variables for chapter 06
 django_dir: "{{repo_directory}}/Web/lampisite"

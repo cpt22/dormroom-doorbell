@@ -1,0 +1,15 @@
+- import_tasks: 01_apt_cache_update.yml
+- import_tasks: 02_apt_upgrade.yml
+- import_tasks: 03_enable_ssh.yml
+- import_tasks: 04_rpi_uart.yml
+- import_tasks: 05_git.yml
+- import_tasks: 06_python3_and_pip.yml
+- import_tasks: 07_mosquitto.yml
+- import_tasks: 08_bluetooth.yml
+- import_tasks: 09_i2s_setup.yml
+- import_tasks: 10_setup_repo.yml
+- import_tasks: 11_nodejs.yml
+- import_tasks: 12_bleno.yml
+- import_tasks: 13_mqtt_bridge.yml
+- import_tasks: 14_supervisor.yml
+- import_tasks: 99_reboot.yml

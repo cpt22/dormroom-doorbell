@@ -1,0 +1,24 @@
+- name: install supervisor
+  become: True
+  apt:
+    name: supervisor
+    force: yes
+    cache_valid_time: "{{ cache_update_valid_secs }}"
+
+- name: install supervisor configuration files
+  become: True
+  template:
+    dest: "/etc/supervisor/conf.d/{{ item.filename }}"
+    owner: root
+    mode: u+rw,g=r,o=r
+    src: "{{ item.src }}"
+  with_items:
+    - { filename: "doorbell_service.conf", src: "doorbell_service.conf" }
+
+- name: make supervisord aware of our new programs to manage
+  become: True
+  supervisorctl:
+    name: "{{ item }}"
+    state: "present"
+  with_items:
+    - doorbell_service

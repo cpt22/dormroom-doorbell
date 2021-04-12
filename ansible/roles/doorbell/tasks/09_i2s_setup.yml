@@ -1,0 +1,10 @@
+- name: install adafruit-python-shell
+  pip:
+    name: adafruit-python-shell
+    executable: pip3
+    extra_args: --upgrade
+
+- name: run i2s install script
+  ansible.builtin.script: files/i2smic.py
+  args:
+    executable: python3

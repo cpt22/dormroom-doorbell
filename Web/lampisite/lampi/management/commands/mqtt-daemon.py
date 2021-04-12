@@ -7,14 +7,17 @@ from lampi.models import *
 from mixpanel import Mixpanel
 import json
 
-MQTT_BROKER_RE_PATTERN = (r'\$sys\/broker\/connection\/'
-                          r'(?P<device_id>[0-9a-f]*)_broker/state')
+MQTT_LAMPI_BROKER_RE_PATTERN = (r'\$sys\/broker\/connection\/'
+                          r'(?P<device_id>[0-9a-f]*)_lampi_broker/state')
+
+MQTT_DOORBELL_BROKER_RE_PATTERN = (r'\$sys\/broker\/connection\/'
+                          r'(?P<device_id>[0-9a-f]*)_doorbell_broker/state')
 
 DEVICE_STATE_RE_PATTERN = r'devices\/(?P<device_id>[0-9a-f]*)\/lamp\/changed'
 
 
-def device_association_topic(device_id):
-    return 'devices/{}/lamp/associated'.format(device_id)
+def device_association_topic(device_id, type):
+    return 'devices/{}/{}/associated'.format(device_id, type)
 
 
 class Command(BaseCommand):
@@ -52,7 +55,7 @@ class Command(BaseCommand):
         # message payload has to treated as type "bytes" in Python 3
         if message.payload == b'1':
             # broker connected
-            results = re.search(MQTT_BROKER_RE_PATTERN, message.topic.lower())
+            results = re.search(MQTT_LAMPI_BROKER_RE_PATTERN, message.topic.lower())
             device_id = results.group('device_id')
             try:
                 device = Lampi.objects.get(device_id=device_id)
@@ -75,7 +78,7 @@ class Command(BaseCommand):
         self._monitor_for_connection_events(client, userdata, message)
 
     def _monitor_for_connection_events(self, client, userdata, message):
-        results = re.search(MQTT_BROKER_RE_PATTERN, message.topic.lower())
+        results = re.search(MQTT_LAMPI_BROKER_RE_PATTERN, message.topic.lower())
         device_id = results.group('device_id')
         connection_state = 'unknown'
         if message.payload == b'1':
