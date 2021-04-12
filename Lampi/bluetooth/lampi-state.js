@@ -35,7 +35,7 @@ function LampiState() {
     });
 
     mqtt_client.on('message', function(topic, message) {
-        new_state = JSON.parse(message);
+        let new_state = JSON.parse(message);
         console.log('NEW STATE: ', new_state);
         // if the client id matches ours and we have received
         //   at least one update before

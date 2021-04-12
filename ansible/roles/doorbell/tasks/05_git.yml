@@ -2,4 +2,4 @@
   become: yes
   apt:
     name: git
-    cache_valid_time: "{{ cahce_update_valid_secs }}"
+    cache_valid_time: "{{ cache_update_valid_secs }}"

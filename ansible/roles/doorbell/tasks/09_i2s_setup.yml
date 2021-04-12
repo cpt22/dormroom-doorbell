@@ -1,10 +1,12 @@
 - name: install adafruit-python-shell
+  become: True
   pip:
     name: adafruit-python-shell
     executable: pip3
     extra_args: --upgrade
 
 - name: run i2s install script
+  become: True
   ansible.builtin.script: files/i2smic.py
   args:
     executable: python3
