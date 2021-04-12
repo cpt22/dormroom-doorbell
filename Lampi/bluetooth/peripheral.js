@@ -1,39 +1,41 @@
-#! /home/pi/.nvm/versions/node/v8.15.1/bin/node
-
-
+#! /usr/bin/env node
 var child_process = require('child_process');
 var device_id = child_process.execSync('cat /sys/class/net/eth0/address | sed s/://g').toString().replace(/\n$/, '');
-console.log("Device ID: " + device_id);
 
 process.env['BLENO_DEVICE_NAME'] = 'LAMPI ' + device_id;
 
+var serviceName = 'LampiService';
 var bleno = require('bleno');
-
+var mqtt = require('mqtt');
+ 
+var LampiState = require('./lampi-state');
+var LampiService = require('./lampi-service');
 var DeviceInfoService = require('./device-info-service');
 
-var LampState = require('./lampi-state');
-var LampService = require('./lampi-service');
+var lampiState = new LampiState();
+var lampiService = new LampiService( lampiState );
+var deviceInfoService = new DeviceInfoService( 'CWRU', 'LAMPI', device_id);
 
-var lampState = new LampState();
+var bt_clientAddress = null;
+var bt_lastRssi = 0;
 
-var deviceInfoService = new DeviceInfoService( 'CWRU', 'LAMPI', '123456');
-var lampService = new LampService(lampState);
+var mqtt_clientId = 'lamp_bt_central';
+var mqtt_client_connection_topic = 'lamp/connection/' + mqtt_clientId + '/state';
 
-lampState.on('changed-onoff', function(new_value) {
-  console.log('changed-onoff:  value = %d', new_value);
-});
+var mqtt_options = {
+    clientId: mqtt_clientId,
+}
 
-lampState.on('changed-brightness', function(new_value) {
-  console.log('changed-brightness:  value = %d', new_value);
-});
+var mqtt_client = mqtt.connect('mqtt://localhost', mqtt_options);
 
-lampState.on('changed-hsv', function(new_hue, new_saturation) {
-  console.log('changed-hsv:  value = %d', new_hue, new_saturation);
-});
 
 bleno.on('stateChange', function(state) {
   if (state === 'poweredOn') {
-    bleno.startAdvertising('Lampi Service', [lampService.uuid, deviceInfoService.uuid], function(err)  {
+    //
+    // We will also advertise the service ID in the advertising packet,
+    // so it's easier to find.
+    //
+    bleno.startAdvertising('LampiService', [lampiService.uuid, deviceInfoService.uuid], function(err)  {
       if (err) {
         console.log(err);
       }
@@ -49,10 +51,58 @@ bleno.on('stateChange', function(state) {
 bleno.on('advertisingStart', function(err) {
   if (!err) {
     console.log('advertising...');
-    
+    //
+    // Once we are advertising, it's time to set up our services,
+    // along with our characteristics.
+    //
     bleno.setServices([
-      lampService,
-      deviceInfoService,
+        lampiService,
+        deviceInfoService,
     ]);
   }
 });
+
+function updateRSSI(err, rssi) {
+    console.log('RSSI err: ' + err + ' rssi: ' + rssi);
+    // if we are still connected
+    if (bt_clientAddress) {
+        // and large change in RSSI
+        if ( Math.abs(rssi - bt_lastRssi) > 2 ) {
+            // publish RSSI value to MQTT 
+            mqtt_client.publish('lamp/bluetooth', JSON.stringify({
+                'client': bt_clientAddress,
+                'rssi': rssi,
+                }));
+        }
+        // update our last RSSI value
+        bt_lastRssi = rssi;
+        // set a timer to update RSSI again in 1 second
+        setTimeout( function() {
+            bleno.updateRssi( updateRSSI );
+            }, 1000);
+        }
+}
+
+
+bleno.on('accept', function(clientAddress) {
+    console.log('accept: ' + clientAddress);
+    bt_clientAddress = clientAddress;    
+    bt_lastRssi = 0;
+    mqtt_client.publish('lamp/bluetooth', JSON.stringify({
+        state: 'connected',
+        'client': bt_clientAddress,
+        }));
+
+    bleno.updateRssi( updateRSSI );
+});
+
+bleno.on('disconnect', function(clientAddress) {
+    console.log('disconnect: ' + clientAddress);
+    mqtt_client.publish('lamp/bluetooth', JSON.stringify({
+        state: 'disconnected',
+        'client': bt_clientAddress,
+        }));
+    bt_clientAddress = null;
+    bt_lastRssi = 0;
+});
+

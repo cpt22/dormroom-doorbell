@@ -1,19 +1,18 @@
 var util = require('util');
 var events = require('events');
 
-function lampState() {
-    // our state variable
+function DeviceState() {
+
     this.value = 0;
 }
 
-util.inherits(lampState, events.EventEmitter);
+util.inherits(DeviceState, events.EventEmitter);
 
-lampState.prototype.set_value = function(new_value) {
-    if( this.value !== new_value) {
+DeviceState.prototype.set_value = function(new_value) {
+    if( this.value != new_value) {
         this.value = new_value % 256;
-        this.emit('lampState changed', this.value);
+        this.emit('changed', this.value);
     }
 };
 
-
-module.exports = lampState;
+module.exports = DeviceState;

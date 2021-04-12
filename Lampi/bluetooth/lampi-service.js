@@ -1,21 +1,21 @@
 var util = require('util');
-var events = require('events');
 var bleno = require('bleno');
-var OnOffCharacteristic = require('./lampi-onoff-characteristic');
-var BrightnessCharacteristic = require('./lampi-brightness-characteristic');
-var HSVCharacteristic = require('./lampi-hsv-characteristic');
 
-function LampService(lampState) {
+var LampiOnOffCharacteristic = require('./lampi-onoff-characteristic');
+var LampiBrightnessCharacteristic = require('./lampi-brightness-characteristic');
+var LampiHSVCharacteristic = require('./lampi-hsv-characteristic');
+
+function LampiService(lampiState) {
     bleno.PrimaryService.call(this, {
         uuid: '0001A7D3-D8A4-4FEA-8174-1736E808C066',
         characteristics: [
-            new OnOffCharacteristic(lampState),
-            new BrightnessCharacteristic(lampState),
-            new HSVCharacteristic(lampState),
+            new LampiHSVCharacteristic(lampiState),
+            new LampiBrightnessCharacteristic(lampiState),
+            new LampiOnOffCharacteristic(lampiState),
         ]
     });
 }
 
-util.inherits(LampService, bleno.PrimaryService);
+util.inherits(LampiService, bleno.PrimaryService);
 
-module.exports = LampService;
+module.exports = LampiService;
