@@ -15,6 +15,9 @@ def get_parked_user():
 def generate_association_code():
     return uuid4().hex
 
+def generate_device_association_topic(type, device_id):
+    return 'devices/{}/{}/associated'.format(device_id, type)
+
 
 class Lampi(models.Model):
     name = models.CharField(max_length=50, default="My LAMPI")
@@ -25,11 +28,13 @@ class Lampi(models.Model):
                                         default=generate_association_code)
     created_at = models.DateTimeField(auto_now_add=True)
 
+    type = "lamp"
+
     def __str__(self):
         return "{}: {}".format(self.device_id, self.name)
 
-    def _generate_device_association_topic(self):
-        return 'devices/{}/lamp/associated'.format(self.device_id)
+    #def _generate_device_association_topic(self):
+    #    return 'devices/{}/lamp/associated'.format(self.device_id)
 
     def publish_unassociated_msg(self):
         # send association MQTT message
@@ -37,7 +42,7 @@ class Lampi(models.Model):
         assoc_msg['associated'] = False
         assoc_msg['code'] = self.association_code
         paho.mqtt.publish.single(
-            self._generate_device_association_topic(),
+            generate_device_association_topic(self.type, self.device_id),
             json.dumps(assoc_msg),
             qos=2,
             retain=True,
@@ -53,10 +58,56 @@ class Lampi(models.Model):
         assoc_msg = {}
         assoc_msg['associated'] = True
         paho.mqtt.publish.single(
-            self._generate_device_association_topic(),
+            generate_device_association_topic(self.type, self.device_id),
             json.dumps(assoc_msg),
             qos=2,
             retain=True,
             hostname="localhost",
             port=50001,
             )
+
+
+class Doorbell(models.Model):
+    name = models.CharField(max_length=50, default="My Doorbell")
+    device_id = models.CharField(max_length=12, primary_key=True)
+    user = models.ForeignKey(User,
+                             on_delete=models.SET(get_parked_user))
+    association_code = models.CharField(max_length=32, unique=True,
+                                        default=generate_association_code)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    type = "doorbell"
+
+    def __str__(self):
+        return "{}: {}".format(self.device_id, self.name)
+
+    def publish_unassociated_msg(self):
+        # send association MQTT message
+        assoc_msg = {}
+        assoc_msg['associated'] = False
+        assoc_msg['code'] = self.association_code
+        paho.mqtt.publish.single(
+            generate_device_association_topic(self.type, self.device_id),
+            json.dumps(assoc_msg),
+            qos=2,
+            retain=True,
+            hostname="localhost",
+            port=50001,
+            )
+
+    def associate_and_publish_associated_msg(self,  user):
+        # update Doorbell instance with new user
+        self.user = user
+        self.save()
+        # publish associated message
+        assoc_msg = {}
+        assoc_msg['associated'] = True
+        paho.mqtt.publish.single(
+            generate_device_association_topic(self.type, self.device_id),
+            json.dumps(assoc_msg),
+            qos=2,
+            retain=True,
+            hostname="localhost",
+            port=50001,
+            )
+
