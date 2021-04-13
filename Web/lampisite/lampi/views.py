@@ -2,7 +2,7 @@ from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
 from .models import Lampi
-from lampi.forms import AddLampiForm
+from lampi.forms import AddDeviceForm
 
 
 class IndexView(LoginRequiredMixin, generic.ListView):
@@ -25,12 +25,12 @@ class DetailView(LoginRequiredMixin, generic.TemplateView):
         return context
 
 
-class AddLampiView(LoginRequiredMixin, generic.FormView):
-    template_name = 'lampi/addlampi.html'
-    form_class = AddLampiForm
+class AddDeviceView(LoginRequiredMixin, generic.FormView):
+    template_name = 'lampi/adddevice.html'
+    form_class = AddDeviceForm
     success_url = '/lampi'
 
     def form_valid(self, form):
         device = form.cleaned_data['device']
         device.associate_and_publish_associated_msg(self.request.user)
-        return super(AddLampiView, self).form_valid(form)
+        return super(AddDeviceView, self).form_valid(form)
