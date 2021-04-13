@@ -75,6 +75,7 @@ class Doorbell(models.Model):
     association_code = models.CharField(max_length=32, unique=True,
                                         default=generate_association_code)
     created_at = models.DateTimeField(auto_now_add=True)
+    lampis = models.ManyToManyField('Lampi', through='LampiDoorbellLink', related_name='doorbells')
 
     type = "doorbell"
 
@@ -111,3 +112,15 @@ class Doorbell(models.Model):
             port=50001,
             )
 
+
+class LampiDoorbellLink(models.Model):
+    doorbell = models.ForeignKey('Doorbell', related_name='link', on_delete=models.CASCADE)
+    lampi = models.ForeignKey('Lampi', related_name='link', on_delete=models.CASCADE)
+
+
+#    user = models.ForeignKey(User, on_delete=models.CASCADE)
+#    lampi_id = models.ForeignKey(Lampi, on_delete=models.CASCADE, primary_key=True)
+#    doorbell_id = models.ForeignKey(Doorbell, on_delete=models.CASCADE, primary_key=True)
+
+#    def __str__(self):
+#        return "{}: {} -> {}".format(self.user, self.doorbell_id, self.lampi_id)
