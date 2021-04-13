@@ -8,7 +8,7 @@
     src: "{{ item.src }}"
   with_items:
     - { filename: "hci0_up.conf", src: "hci0_up.conf" }
-#    - { filename: "bluetooth_service.conf", src: "bluetooth_service.conf" }
+    - { filename: "bluetooth_service.conf", src: "bluetooth_service.conf" }
 
 - name: make supervisord aware of new programs to manage
   become: True
@@ -18,4 +18,4 @@
     state: "present"
   with_items:
     - hci0_up
-#    - bluetooth_service
+    - bluetooth_service
