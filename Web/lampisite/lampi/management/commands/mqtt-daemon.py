@@ -55,30 +55,56 @@ class Command(BaseCommand):
         # message payload has to treated as type "bytes" in Python 3
         if message.payload == b'1':
             # broker connected
-            results = re.search(MQTT_LAMPI_BROKER_RE_PATTERN, message.topic.lower())
-            device_id = results.group('device_id')
-            try:
-                device = Lampi.objects.get(device_id=device_id)
-                print("Found {}".format(device))
-            except Lampi.DoesNotExist:
-                # this is a new device - create new record for it
-                new_device = Lampi(device_id=device_id)
-                uname = settings.DEFAULT_USER
-                new_device.user = User.objects.get(username=uname)
-                new_device.save()
-                print("Created {}".format(new_device))
-                # send association MQTT message
-                new_device.publish_unassociated_msg()
-                # record a new activation
-                self.mp.track(new_device.user.username, "LAMPI Activation",
-                              {'event_type': 'activations', 'interface': 'mqtt', 'device_id': device_id})
+            topic_lower = message.topic.lower()
+            if "_doorbell_broker" in topic_lower:
+                results = re.search(MQTT_DOORBELL_BROKER_RE_PATTERN, topic_lower)
+                device_id = results.group('device_id')
+                try:
+                    device = Doorbell.objects.get(device_id=device_id)
+                    print("Found Doorbell {}".format(device))
+                except Doorbell.DoesNotExist:
+                    #this is a new device - create a new record for it
+                    new_device = Doorbell(device_id=device_id)
+                    uname = settings.DEFAULT_USER
+                    new_device.user = User.objects.get(username=uname)
+                    new_device.save()
+                    print("Created Doorbell {}".format(new_device))
+                    # send association MQTT message
+                    new_device.publish_unassociated_msg()
+                    # record a new activation
+                    self.mp.track(new_device.user.username, "Doorbell Activation",
+                                  {'event_type': 'activations', 'interface': 'mqtt', 'device_id': device_id})
+            elif "_lampi_broker" in topic_lower:
+                results = re.search(MQTT_LAMPI_BROKER_RE_PATTERN, topic_lower)
+                device_id = results.group('device_id')
+                try:
+                    device = Lampi.objects.get(device_id=device_id)
+                    print("Found Lampi {}".format(device))
+                except Lampi.DoesNotExist:
+                    # this is a new device - create new record for it
+                    new_device = Lampi(device_id=device_id)
+                    uname = settings.DEFAULT_USER
+                    new_device.user = User.objects.get(username=uname)
+                    new_device.save()
+                    print("Created Lampi {}".format(new_device))
+                    # send association MQTT message
+                    new_device.publish_unassociated_msg()
+                    # record a new activation
+                    self.mp.track(new_device.user.username, "LAMPI Activation",
+                                  {'event_type': 'activations', 'interface': 'mqtt', 'device_id': device_id})
+            else:
+                print("Unknown device connected")
 
     def _monitor_broker_bridges(self, client, userdata, message):
         self._monitor_for_new_devices(client, userdata, message)
         self._monitor_for_connection_events(client, userdata, message)
 
     def _monitor_for_connection_events(self, client, userdata, message):
-        results = re.search(MQTT_LAMPI_BROKER_RE_PATTERN, message.topic.lower())
+        topic_lower = message.topic.lower()
+        if "_doorbell_broker" in topic_lower:
+            results = re.search(MQTT_DOORBELL_BROKER_RE_PATTERN, topic_lower)
+        else:
+            results = re.search(MQTT_LAMPI_BROKER_RE_PATTERN, topic_lower)
         device_id = results.group('device_id')
         connection_state = 'unknown'
         if message.payload == b'1':
