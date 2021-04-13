@@ -4,7 +4,7 @@ var bleno = require('bleno');
 var DoorbellSSIDCharacteristic = require('./doorbell-ssid-characteristic');
 var DoorbellPSKCharacteristic = require('./doorbell-psk-characteristic');
 var DoorbellUpdateCredentialsService = require('./doorbell-update-credentials-characteristic');
-var DoorbellAssociationCharacteristic = require('./doorbell-association-characteristic');
+var DoorbellAssociationStateCharacteristic = require('./doorbell-association-state-characteristic');
 var DoorbellAssociationCodeCharacteristic = require('./doorbell-association-code-characteristic');
 
 function DoorbellService(doorbellState) {
@@ -14,7 +14,7 @@ function DoorbellService(doorbellState) {
             new DoorbellSSIDCharacteristic(doorbellState),
             new DoorbellPSKCharacteristic(doorbellState),
             new DoorbellUpdateCredentialsService(doorbellState),
-            new DoorbellAssociationCharacteristic(doorbellState),
+            new DoorbellAssociationStateCharacteristic(doorbellState),
             new DoorbellAssociationCodeCharacteristic(doorbellState),
         ]
     });

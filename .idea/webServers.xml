@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="58b241f8-8d26-47b8-9e1e-029096a3895d" name="lampi-final">
+        <fileTransfer accessType="SFTP" host="lampi" port="22" sshConfigId="46785d70-710b-40a3-808c-619080372544" sshConfig="pi@lampi:22 agent" authAgent="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="bb07cfae-af4c-499e-ad1b-e8eb633e5221" name="cloud-final">
+        <fileTransfer accessType="SFTP" host="iot_cloud" port="22" sshConfigId="cfffb083-eb1d-4ca4-9f65-e5fb42f6ebc0" sshConfig="ubuntu@iot_cloud:22 agent" authAgent="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

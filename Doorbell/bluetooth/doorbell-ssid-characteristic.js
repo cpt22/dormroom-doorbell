@@ -35,7 +35,7 @@ DoorbellSSIDCharacteristic.prototype.onReadRequest = function(offset, callback) 
         console.log('onReadRequest offset');
         callback(this.RESULT_ATTR_NOT_LONG, null);
     } else {
-        let responseData = new Buffer(str);
+        let responseData = new Buffer(this.doorbellState.ssid);
         console.log("onReadRequest returning ", responseData);
         callback(this.RESULT_SUCCESS, responseData);
     }
@@ -47,8 +47,8 @@ DoorbellSSIDCharacteristic.prototype.onWriteRequest = function(data, offset, wit
     } else if (data.length <= 0) {
         callback(this.RESULT_INVALID_ATTRIBUTE_LENGTH);
     } else {
-        str = data.toString();
-        this.LampiState
+        let str = data.toString();
+        this.doorbellState.set_ssid(str);
         console.log(data.toString());
         callback(this.RESULT_SUCCESS);
     }

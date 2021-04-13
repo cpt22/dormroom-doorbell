@@ -9,9 +9,11 @@ var bleno = require('bleno');
 var mqtt = require('mqtt');
 
 var DoorbellService = require('./doorbell-service');
+var DoorbellState = require('./doorbell-state');
 var DeviceInfoService = require('./device-info-service');
 
-var doorbellService = new DoorbellService();
+var doorbellState = new DoorbellState();
+var doorbellService = new DoorbellService(doorbellState);
 var deviceInfoService = new DeviceInfoService('CWRU', 'DOORBELL', device_id);
 
 var bt_clientAddress = null;

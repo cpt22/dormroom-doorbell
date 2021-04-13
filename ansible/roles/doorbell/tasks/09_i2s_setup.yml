@@ -7,6 +7,6 @@
 
 - name: run i2s install script
   become: True
-  ansible.builtin.script: files/i2smic.py
+  script: files/i2smic.py
   args:
     executable: python3

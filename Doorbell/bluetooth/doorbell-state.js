@@ -7,8 +7,9 @@ function DoorbellState() {
 
     this.ssid = "";
     this.psk = "";
+    this.last_attempt = false;
     this.assoc_code = "";
-    this.isAssociated = false;
+    this.assoc_state = false;
     this.clientId = 'doorbell_bt_peripheral';
     this.has_received_first_update = false;
 
@@ -32,27 +33,30 @@ function DoorbellState() {
         console.log('connected!');
         mqtt_client.publish(client_connection_topic,
             '1', {qos:2, retain:true})
-        mqtt_client.subscribe('')
+        mqtt_client.subscribe(association_topic);
     })
 
     mqtt_client.on('message', function(topic, message) {
+        console.log('MQTT Message on: ', topic);
         if (topic === association_topic) {
             let new_data = JSON.parse(message);
-
-            if ( new_data['associated'] != that.isAssociated ||
-                (new_data['associated'] == false && new_data['code'] != that.code)) {
+            console.log(new_data['code'] == that.assoc_code);
+            if ( (new_data['associated'] == false && new_data['code'] == that.assoc_code) &&
+            new_data['associated'] == that.assoc_state ) {
+                console.log("Returning");
                 return;
             }
 
             that.assoc_code = "";
-            if( new_data['associated'] == false ) {
-                that.isAssociated = false;
+            if( new_data['associated'] === false) {
+                that.assoc_state = false;
                 that.assoc_code = new_data['code'];
-                console.log("Association Code: ", assoc_code);
+                console.log("Association Code: ", that.assoc_code);
             } else {
-                that.isAssociated = true;
+                that.assoc_state = true;
+                console.log("Associated");
             }
-            that.emit('changed-association', that.isAssociated, that.assoc_code);
+            that.emit('changed-association', that.assoc_state, that.assoc_code);
             that.has_received_first_update = true;
         } else {
             console.log('unknown mqtt topic');
@@ -64,21 +68,27 @@ function DoorbellState() {
 
 util.inherits(DoorbellState, events.EventEmitter);
 
-DoorbellState.prototype.setSSID = function(ssid) {
+DoorbellState.prototype.set_ssid = function(ssid) {
+    console.log("setting ssid: ", ssid);
     this.ssid = ssid;
 }
 
-DoorbellState.prototype.setPSK = function(psk) {
+DoorbellState.prototype.set_psk = function(psk) {
+    console.log("setting psk: ", psk);
     this.psk = psk;
 }
 
-DoorbellState.prototype.joinWiFi = function(button) {
+DoorbellState.prototype.join_wifi = function() {
     if (this.ssid != "") {
         var tmp = {'client': this.clientId, 'ssid': this.ssid, 'psk': this.psk}
         this.mqtt_client.publish('doorbell/set_wifi', JSON.stringify(tmp));
         console.log('set wifi data');
+        this.last_attempt = true;
+        return true;
     } else {
         console.log('missing ssid');
+        this.last_attempt = false;
+        return false;
     }
 }
 

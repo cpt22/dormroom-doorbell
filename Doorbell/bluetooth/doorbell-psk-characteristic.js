@@ -34,7 +34,7 @@ DoorbellPSKCharacteristic.prototype.onReadRequest = function(offset, callback) {
         console.log('onReadRequest offset');
         callback(this.RESULT_ATTR_NOT_LONG, null);
     } else {
-        let responseData = new Buffer(str);
+        let responseData = new Buffer(this.doorbellState.psk);
         console.log("onReadRequest returning ", responseData);
         callback(this.RESULT_SUCCESS, responseData);
     }
@@ -46,7 +46,8 @@ DoorbellPSKCharacteristic.prototype.onWriteRequest = function(data, offset, with
     } else if (data.length <= 0) {
         callback(this.RESULT_INVALID_ATTRIBUTE_LENGTH);
     } else {
-        str = data.toString();
+        let str = data.toString();
+        this.doorbellState.set_psk(str);
         console.log(data.toString());
         callback(this.RESULT_SUCCESS);
     }

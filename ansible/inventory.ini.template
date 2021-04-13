@@ -5,7 +5,7 @@
 
 # replace <IP> with the IP address of your LAMPi 
 #   (e.g., "ansible_ssh_host=10.0.1.34")
-lampi ansible_user=pi ansible_ssh_host=192.168.100.50
+lampi ansible_user=pi ansible_ssh_host=<IP>
 
 # replace <IP> with the IP address (or DNS) of your EC2 instance
 #  (e.g., "ansible_ssh_host=10.0.1.34")
@@ -13,7 +13,7 @@ ec2  ansible_user=ubuntu ansible_ssh_host=<IP>
 
 # replace <IP> with the IP address (or DNS) of your doorbell
 #  (e.g., "ansible_ssh_host=10.0.1.34")
-doorbell  ansible_user=pi ansible_ssh_host=192.168.100.51
+doorbell  ansible_user=pi ansible_ssh_host=<IP>
 
 # our "group" of LAMPIs, listing the hostname for each on a separate line
 [lampis]
