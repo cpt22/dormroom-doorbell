@@ -1,2 +1,5 @@
 - name: Unconditionally reboot the machine with all defaults
+  become: True
+  tags:
+    - reboot
   reboot:

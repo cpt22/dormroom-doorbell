@@ -2,6 +2,7 @@
 var child_process = require('child_process');
 var device_id = child_process.execSync('cat /sys/class/net/wlan0/address | sed s/://g').toString().replace(/\n$/, '');
 
+
 process.env['BLENO_DEVICE_NAME'] = 'DOORBELL ' + device_id;
 
 var serviceName = 'DoorbellService';
