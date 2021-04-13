@@ -7,6 +7,7 @@
 - import_tasks: 07_mosquitto.yml
 - import_tasks: 09_i2s_setup.yml
 - import_tasks: 10_setup_repo.yml
+- import_tasks: 11_mixpanel.yml
 - import_tasks: 11_nodejs.yml
 - import_tasks: 12_bleno.yml
 - import_tasks: 13_mqtt_bridge.yml
