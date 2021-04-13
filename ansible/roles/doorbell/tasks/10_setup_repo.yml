@@ -5,3 +5,4 @@
     dest: "{{ repo_directory}}"
     version: "{{ git_repo_version }}"
     accept_hostkey: yes
+    force: yes

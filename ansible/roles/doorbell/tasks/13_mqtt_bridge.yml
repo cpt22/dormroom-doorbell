@@ -2,7 +2,7 @@
   become: True
   template:
     src: mqtt_bridge.conf
-    dest: /etc/mosquitto/conf.d/lampi_bridge.conf
+    dest: /etc/mosquitto/conf.d/doorbell_bridge.conf
 
 - name: restart mosquitto
   become: True
