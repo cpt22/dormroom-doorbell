@@ -31,7 +31,8 @@
   with_items:
     - { filename: "pigpiod.conf", src: "pigpiod.conf" } 
     - { filename: "lamp_service.conf", src: "lamp_service.conf" } 
-    - { filename: "lamp_ui.conf", src: "lamp_ui.conf" } 
+    - { filename: "lamp_ui.conf", src: "lamp_ui.conf" }
+    - { filename: "wifi_service.conf", src: "wifi_service.conf }
 
 
 - name: make supervisord aware of our new programs to manage
@@ -43,5 +44,6 @@
     - pigpiod
     - lamp_service
     - lamp_ui
+    - wifi_service
   
 
