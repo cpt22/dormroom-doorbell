@@ -11,10 +11,12 @@ var mqtt = require('mqtt');
 var LampiState = require('./lampi-state');
 var LampiService = require('./lampi-service');
 var DeviceInfoService = require('./device-info-service');
+var WifiService = require('../../Common/bluetooth/wifi-service');
 
 var lampiState = new LampiState();
 var lampiService = new LampiService( lampiState );
 var deviceInfoService = new DeviceInfoService( 'CWRU', 'LAMPI', device_id);
+var wifiService = new WifiService();
 
 var bt_clientAddress = null;
 var bt_lastRssi = 0;

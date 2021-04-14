@@ -5,7 +5,7 @@ var CHARACTERISTIC_NAME = 'Association State';
 
 var DoorbellAssociationStateCharacteristic = function (doorbellState) {
     DoorbellAssociationStateCharacteristic.super_.call(this, {
-        uuid: '9771695f-2ca0-4144-af5d-90a86d82ab40',
+        uuid: '9772695f-2ca0-4144-af5d-90a86d82ab40',
         properties: ['read', 'write', 'notify'],
         secure: [],
         descriptors: [

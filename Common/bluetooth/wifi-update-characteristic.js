@@ -3,9 +3,9 @@ var bleno = require('bleno');
 
 var CHARACTERISTIC_NAME = 'Update Credentials';
 
-var DoorbellUpdateCredentialsCharacteristic = function(doorbellState) {
-    DoorbellUpdateCredentialsCharacteristic.super_.call(this, {
-        uuid: '9773695f-2ca0-4144-af5d-90a86d82ab40',
+var WifiUpdateCharacteristic = function(wifiState) {
+    WifiUpdateCharacteristic.super_.call(this, {
+        uuid: '38c7042c-12da-49e8-845e-6086d18a81fa',
         properties: ['read', 'write', 'notify'],
         secure: [],
         descriptors: [
@@ -21,20 +21,20 @@ var DoorbellUpdateCredentialsCharacteristic = function(doorbellState) {
     });
 
     this._update = null;
-    this.doorbellState = doorbellState;
+    this.wifiState = wifiState;
 
 }
 
-util.inherits(DoorbellUpdateCredentialsCharacteristic, bleno.Characteristic);
+util.inherits(WifiUpdateCharacteristic, bleno.Characteristic);
 
-DoorbellUpdateCredentialsCharacteristic.prototype.onReadRequest = function(offset, callback) {
+WifiUpdateCharacteristic.prototype.onReadRequest = function(offset, callback) {
     console.log('onReadRequest');
     if (offset) {
         console.log('onReadRequest offset');
         callback(this.RESULT_ATTR_NOT_LONG, null);
     } else {
         var responseData = new Buffer(1);;
-        if (this.doorbellState.last_attempt) {
+        if (this.wifiState.last_attempt) {
             responseData.writeUInt8(0x01, 0);
         } else {
             responseData.writeUInt8(0x00, 0);
@@ -44,7 +44,7 @@ DoorbellUpdateCredentialsCharacteristic.prototype.onReadRequest = function(offse
     }
 }
 
-DoorbellUpdateCredentialsCharacteristic.prototype.onWriteRequest = function(data, offset, withoutRespose, callback) {
+WifiUpdateCharacteristic.prototype.onWriteRequest = function(data, offset, withoutRespose, callback) {
     if (offset) {
         callback(this.RESULT_ATTR_NOT_LONG);
     } else if (data.length <= 0) {
@@ -53,7 +53,7 @@ DoorbellUpdateCredentialsCharacteristic.prototype.onWriteRequest = function(data
         var new_state = data.readUInt8(0);
         console.log(data.toString());
 
-        let result = this.doorbellState.join_wifi();
+        let result = this.wifiState.join_wifi();
         if ( this._update !== null ) {
             var data = new Buffer(1);
             console.log("updating with result ", result);
@@ -69,14 +69,14 @@ DoorbellUpdateCredentialsCharacteristic.prototype.onWriteRequest = function(data
     }
 }
 
-DoorbellUpdateCredentialsCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValueCallback) {
+WifiUpdateCharacteristic.prototype.onSubscribe = function(maxValueSize, updateValueCallback) {
     console.log('subscribe on ', CHARACTERISTIC_NAME);
     this._update = updateValueCallback;
 }
 
-DoorbellUpdateCredentialsCharacteristic.prototype.onUnsubscribe = function() {
+WifiUpdateCharacteristic.prototype.onUnsubscribe = function() {
     console.log('unsubscribe on ', CHARACTERISTIC_NAME);
     this._update = null;
 }
 
-module.exports = DoorbellUpdateCredentialsCharacteristic;
+module.exports = WifiUpdateCharacteristic;

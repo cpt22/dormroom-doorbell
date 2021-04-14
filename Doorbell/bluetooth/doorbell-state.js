@@ -5,9 +5,9 @@ var mqtt = require('mqtt');
 function DoorbellState() {
     events.EventEmitter.call(this);
 
-    this.ssid = "";
-    this.psk = "";
-    this.last_attempt = false;
+    //this.ssid = "";
+    //this.psk = "";
+    //this.last_attempt = false;
     this.assoc_code = "";
     this.assoc_state = false;
     this.clientId = 'doorbell_bt_peripheral';
@@ -34,7 +34,7 @@ function DoorbellState() {
         mqtt_client.publish(client_connection_topic,
             '1', {qos:2, retain:true})
         mqtt_client.subscribe(association_topic);
-    })
+    });
 
     mqtt_client.on('message', function(topic, message) {
         console.log('MQTT Message on: ', topic);
@@ -68,7 +68,7 @@ function DoorbellState() {
 
 util.inherits(DoorbellState, events.EventEmitter);
 
-DoorbellState.prototype.set_ssid = function(ssid) {
+/*DoorbellState.prototype.set_ssid = function(ssid) {
     console.log("setting ssid: ", ssid);
     this.ssid = ssid;
 }
@@ -90,6 +90,6 @@ DoorbellState.prototype.join_wifi = function() {
         this.last_attempt = false;
         return false;
     }
-}
+}*/
 
 module.exports = DoorbellState;

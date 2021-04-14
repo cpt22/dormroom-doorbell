@@ -2,11 +2,10 @@ var util = require('util');
 var bleno = require('bleno');
 
 var CHARACTERISTIC_NAME = 'PSK';
-var str = "";
 
-var  DoorbellPSKCharacteristic = function(doorbellState) {
-    DoorbellPSKCharacteristic.super_.call(this, {
-        uuid: '9772695f-2ca0-4144-af5d-90a86d82ab40',
+var WifiPskCharacteristic = function(wifiState) {
+    WifiPskCharacteristic.super_.call(this, {
+        uuid: '28c7042c-12da-49e8-845e-6086d18a81fa',
         properties: ['read', 'write'],
         secure: [],
         descriptors: [
@@ -22,35 +21,35 @@ var  DoorbellPSKCharacteristic = function(doorbellState) {
     });
 
     this._update = null;
-    this.doorbellState = doorbellState;
+    this.wifiState = wifiState;
 
 }
 
-util.inherits(DoorbellPSKCharacteristic, bleno.Characteristic);
+util.inherits(WifiPskCharacteristic, bleno.Characteristic);
 
-DoorbellPSKCharacteristic.prototype.onReadRequest = function(offset, callback) {
+WifiPskCharacteristic.prototype.onReadRequest = function(offset, callback) {
     console.log('onReadRequest');
     if (offset) {
         console.log('onReadRequest offset');
         callback(this.RESULT_ATTR_NOT_LONG, null);
     } else {
-        let responseData = new Buffer(this.doorbellState.psk);
+        let responseData = new Buffer(this.wifiState.psk);
         console.log("onReadRequest returning ", responseData);
         callback(this.RESULT_SUCCESS, responseData);
     }
 }
 
-DoorbellPSKCharacteristic.prototype.onWriteRequest = function(data, offset, withoutRespose, callback) {
+WifiPskCharacteristic.prototype.onWriteRequest = function(data, offset, withoutRespose, callback) {
     if (offset) {
         callback(this.RESULT_ATTR_NOT_LONG);
     } else if (data.length <= 0) {
         callback(this.RESULT_INVALID_ATTRIBUTE_LENGTH);
     } else {
         let str = data.toString();
-        this.doorbellState.set_psk(str);
+        this.wifiState.set_psk(str);
         console.log(data.toString());
         callback(this.RESULT_SUCCESS);
     }
 }
 
-module.exports = DoorbellPSKCharacteristic;
+module.exports = WifiPskCharacteristic;

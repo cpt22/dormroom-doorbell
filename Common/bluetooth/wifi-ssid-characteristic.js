@@ -2,11 +2,10 @@ var util = require('util');
 var bleno = require('bleno');
 
 var CHARACTERISTIC_NAME = 'SSID';
-var str = "";
 
-var DoorbellSSIDCharacteristic = function(doorbellState) {
-    DoorbellSSIDCharacteristic.super_.call(this, {
-        uuid: '9771695f-2ca0-4144-af5d-90a86d82ab40',
+var WifiSsidCharacteristic = function(wifiState) {
+    WifiSsidCharacteristic.super_.call(this, {
+        uuid: '18c7042c-12da-49e8-845e-6086d18a81fa',
         properties: ['read', 'write'],
         secure: [],
         descriptors: [
@@ -23,35 +22,35 @@ var DoorbellSSIDCharacteristic = function(doorbellState) {
 
     this._update = null;
 
-    this.doorbellState = doorbellState;
+    this.wifiState = wifiState;
 
 }
 
-util.inherits(DoorbellSSIDCharacteristic, bleno.Characteristic);
+util.inherits(WifiSsidCharacteristic, bleno.Characteristic);
 
-DoorbellSSIDCharacteristic.prototype.onReadRequest = function(offset, callback) {
+WifiSsidCharacteristic.prototype.onReadRequest = function(offset, callback) {
     console.log('onReadRequest');
     if (offset) {
         console.log('onReadRequest offset');
         callback(this.RESULT_ATTR_NOT_LONG, null);
     } else {
-        let responseData = new Buffer(this.doorbellState.ssid);
+        let responseData = new Buffer(this.wifiState.ssid);
         console.log("onReadRequest returning ", responseData);
         callback(this.RESULT_SUCCESS, responseData);
     }
 }
 
-DoorbellSSIDCharacteristic.prototype.onWriteRequest = function(data, offset, withoutRespose, callback) {
+WifiSsidCharacteristic.prototype.onWriteRequest = function(data, offset, withoutRespose, callback) {
     if (offset) {
         callback(this.RESULT_ATTR_NOT_LONG);
     } else if (data.length <= 0) {
         callback(this.RESULT_INVALID_ATTRIBUTE_LENGTH);
     } else {
         let str = data.toString();
-        this.doorbellState.set_ssid(str);
+        this.wifiState.set_ssid(str);
         console.log(data.toString());
         callback(this.RESULT_SUCCESS);
     }
 }
 
-module.exports = DoorbellSSIDCharacteristic;
+module.exports = WifiSsidCharacteristic;

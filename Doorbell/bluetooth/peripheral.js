@@ -12,10 +12,12 @@ var mqtt = require('mqtt');
 var DoorbellService = require('./doorbell-service');
 var DoorbellState = require('./doorbell-state');
 var DeviceInfoService = require('./device-info-service');
+var WifiService = require('../../Common/bluetooth/wifi-service');
 
 var doorbellState = new DoorbellState();
 var doorbellService = new DoorbellService(doorbellState);
 var deviceInfoService = new DeviceInfoService('CWRU', 'DOORBELL', device_id);
+var wifiService = new WifiService();
 
 var bt_clientAddress = null;
 var bt_lastRssi = 0;
@@ -48,6 +50,7 @@ bleno.on('advertisingStart', function(err) {
 
         bleno.setServices([
             doorbellService,
+            wifiService,
             deviceInfoService,
         ]);
     }
