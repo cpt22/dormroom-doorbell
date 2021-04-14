@@ -7,10 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		197C56442620014A00EED3D2 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 197C56432620014A00EED3D2 /* Mixpanel */; };
-		8516E57B256447D300E819F6 /* LampiBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8516E57A256447D300E819F6 /* LampiBrowserView.swift */; };
-		8516E57F2564514D00E819F6 /* LampiManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8516E57E2564514D00E819F6 /* LampiManager.swift */; };
+		19FA6CC626269673007B23AB /* Doorbell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19FA6CC526269673007B23AB /* Doorbell.swift */; };
+		8516E57B256447D300E819F6 /* DeviceBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8516E57A256447D300E819F6 /* DeviceBrowserView.swift */; };
+		8516E57F2564514D00E819F6 /* DeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8516E57E2564514D00E819F6 /* DeviceManager.swift */; };
 		854D43B9255B2CD600565A15 /* GradientSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 854D43B8255B2CD600565A15 /* GradientSlider.swift */; };
+		8560562B25B22AAC006C0968 /* Mixpanel in Frameworks */ = {isa = PBXBuildFile; productRef = 8560562A25B22AAC006C0968 /* Mixpanel */; };
 		858B9BD52549D7A400A43AC3 /* LampiApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858B9BD42549D7A400A43AC3 /* LampiApp.swift */; };
 		858B9BD72549D7A400A43AC3 /* LampiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 858B9BD62549D7A400A43AC3 /* LampiView.swift */; };
 		858B9BD92549D7A700A43AC3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 858B9BD82549D7A700A43AC3 /* Assets.xcassets */; };
@@ -19,8 +20,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		8516E57A256447D300E819F6 /* LampiBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LampiBrowserView.swift; sourceTree = "<group>"; };
-		8516E57E2564514D00E819F6 /* LampiManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LampiManager.swift; sourceTree = "<group>"; };
+		19FA6CC526269673007B23AB /* Doorbell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Doorbell.swift; sourceTree = "<group>"; };
+		8516E57A256447D300E819F6 /* DeviceBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBrowserView.swift; sourceTree = "<group>"; };
+		8516E57E2564514D00E819F6 /* DeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceManager.swift; sourceTree = "<group>"; };
 		854D43B8255B2CD600565A15 /* GradientSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientSlider.swift; sourceTree = "<group>"; };
 		858B9BD12549D7A400A43AC3 /* Lampi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lampi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		858B9BD42549D7A400A43AC3 /* LampiApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LampiApp.swift; sourceTree = "<group>"; };
@@ -36,7 +38,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				197C56442620014A00EED3D2 /* Mixpanel in Frameworks */,
+				8560562B25B22AAC006C0968 /* Mixpanel in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,7 +49,7 @@
 			isa = PBXGroup;
 			children = (
 				858B9BD62549D7A400A43AC3 /* LampiView.swift */,
-				8516E57A256447D300E819F6 /* LampiBrowserView.swift */,
+				8516E57A256447D300E819F6 /* DeviceBrowserView.swift */,
 				854D43B8255B2CD600565A15 /* GradientSlider.swift */,
 			);
 			path = Views;
@@ -75,10 +77,11 @@
 				858B9BD42549D7A400A43AC3 /* LampiApp.swift */,
 				8516E5782564479B00E819F6 /* Views */,
 				858B9BE42549E2A000A43AC3 /* Lampi.swift */,
-				8516E57E2564514D00E819F6 /* LampiManager.swift */,
+				8516E57E2564514D00E819F6 /* DeviceManager.swift */,
 				858B9BD82549D7A700A43AC3 /* Assets.xcassets */,
 				858B9BDD2549D7A700A43AC3 /* Info.plist */,
 				858B9BDA2549D7A700A43AC3 /* Preview Content */,
+				19FA6CC526269673007B23AB /* Doorbell.swift */,
 			);
 			path = Lampi;
 			sourceTree = "<group>";
@@ -108,7 +111,7 @@
 			);
 			name = Lampi;
 			packageProductDependencies = (
-				197C56432620014A00EED3D2 /* Mixpanel */,
+				8560562A25B22AAC006C0968 /* Mixpanel */,
 			);
 			productName = Lampi;
 			productReference = 858B9BD12549D7A400A43AC3 /* Lampi.app */;
@@ -138,7 +141,7 @@
 			);
 			mainGroup = 858B9BC82549D7A400A43AC3;
 			packageReferences = (
-				197C56422620014A00EED3D2 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
+				8560562925B22AAC006C0968 /* XCRemoteSwiftPackageReference "mixpanel-swift" */,
 			);
 			productRefGroup = 858B9BD22549D7A400A43AC3 /* Products */;
 			projectDirPath = "";
@@ -168,10 +171,11 @@
 			files = (
 				854D43B9255B2CD600565A15 /* GradientSlider.swift in Sources */,
 				858B9BD72549D7A400A43AC3 /* LampiView.swift in Sources */,
+				19FA6CC626269673007B23AB /* Doorbell.swift in Sources */,
 				858B9BE52549E2A000A43AC3 /* Lampi.swift in Sources */,
-				8516E57F2564514D00E819F6 /* LampiManager.swift in Sources */,
+				8516E57F2564514D00E819F6 /* DeviceManager.swift in Sources */,
 				858B9BD52549D7A400A43AC3 /* LampiApp.swift in Sources */,
-				8516E57B256447D300E819F6 /* LampiBrowserView.swift in Sources */,
+				8516E57B256447D300E819F6 /* DeviceBrowserView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -362,20 +366,20 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		197C56422620014A00EED3D2 /* XCRemoteSwiftPackageReference "mixpanel-swift" */ = {
+		8560562925B22AAC006C0968 /* XCRemoteSwiftPackageReference "mixpanel-swift" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/mixpanel/mixpanel-swift";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 2.9.1;
+				minimumVersion = 2.8.1;
 			};
 		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		197C56432620014A00EED3D2 /* Mixpanel */ = {
+		8560562A25B22AAC006C0968 /* Mixpanel */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 197C56422620014A00EED3D2 /* XCRemoteSwiftPackageReference "mixpanel-swift" */;
+			package = 8560562925B22AAC006C0968 /* XCRemoteSwiftPackageReference "mixpanel-swift" */;
 			productName = Mixpanel;
 		};
 /* End XCSwiftPackageProductDependency section */
