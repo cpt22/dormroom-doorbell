@@ -59,13 +59,13 @@ bleno.on('advertisingStart', function(err) {
     //
     bleno.setServices([
         lampiService,
+        wifiService,
         deviceInfoService,
     ]);
   }
 });
 
 function updateRSSI(err, rssi) {
-    console.log('RSSI err: ' + err + ' rssi: ' + rssi);
     // if we are still connected
     if (bt_clientAddress) {
         // and large change in RSSI
