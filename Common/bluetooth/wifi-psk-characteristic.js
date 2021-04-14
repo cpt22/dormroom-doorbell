@@ -40,10 +40,15 @@ WifiPskCharacteristic.prototype.onReadRequest = function(offset, callback) {
 }
 
 WifiPskCharacteristic.prototype.onWriteRequest = function(data, offset, withoutRespose, callback) {
+    console.log("hit write request")
     if (offset) {
         callback(this.RESULT_ATTR_NOT_LONG);
-    } else if (data.length <= 0) {
+    } else if (data.length < 0) {
         callback(this.RESULT_INVALID_ATTRIBUTE_LENGTH);
+    } else if (data.length == 0) {
+        console.log("0 data length");
+        this.wifiState.set_psk("");
+        callback(this.RESULT_SUCCESS);
     } else {
         let str = data.toString();
         this.wifiState.set_psk(str);

@@ -12,9 +12,10 @@ class WifiConfigurator:
 
     def reconfigure(self):
         if not self.ssid:
-            print("ssid must not be empty")
+            raise Exception("SSID must not be empty")
             return
 
+        print("Updating Wifi Configuration")
         base_command = "wpa_cli -i wlan0 "
         network_number = '1'
         successful = False
@@ -51,8 +52,10 @@ class WifiConfigurator:
                 raise Exception("Error: Failed to enable network")
 
             successful = True
+            print("Update Successful")
         except Exception as ex:
             print(ex)
+            print("Update Failed")
         finally:
             self.execute_command(base_command + "save_config")
             self.execute_command(base_command + "reconfigure")
