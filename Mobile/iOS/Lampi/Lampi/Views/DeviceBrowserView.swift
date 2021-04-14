@@ -1,28 +1,28 @@
 //
-//  LampiBrowserView.swift
+//  DeviceBrowserView.swift
 //  Lampi
 //
 
 import SwiftUI
 
-struct LampiBrowserView: View {
-    @ObservedObject var lampiManager = LampiManager()
+struct DeviceBroswerView: View {
+    @ObservedObject var deviceManager = DeviceManager()
 
     var body: some View {
-        if lampiManager.isScanning {
+        if deviceManager.isScanning {
             BLEScannerView()
         } else {
             NavigationView {
-                List(lampiManager.foundLampis, id: \.name) { lampi in
+                List(deviceManager.foundDevices, id: \.name) { lampi in
                     NavigationLink(destination: LampiView(lamp: lampi)) {
-                        LampiRow(lampi: lampi)
+                        DeviceRow(device: lampi)
                     }
                 }
-                .navigationTitle("Nearby Lampis")
+                .navigationTitle("Nearby Devices")
                 .toolbar {
                     ToolbarItem(placement: .primaryAction) {
                         Button(action: {
-                            lampiManager.scanForLampis()
+                            deviceManager.scanForDevices()
                         }) {
                             Image(systemName: "arrow.clockwise")
                         }
@@ -33,35 +33,35 @@ struct LampiBrowserView: View {
     }
 }
 
-struct LampiBrowserView_Previews: PreviewProvider {
+struct DeviceBrowserView_Previews: PreviewProvider {
     static var previews: some View {
-        LampiBrowserView()
+        DeviceBroswerView()
 
-        LampiRow(lampi: Lampi(name: "Test Lampi"))
+        DeviceRow(device: Lampi(name: "Test Lampi"))
             .previewLayout(.sizeThatFits)
     }
 }
 
-private struct LampiRow: View {
-    @ObservedObject var lampi: Lampi
+private struct DeviceRow: View {
+    @ObservedObject var device: Lampi
 
     var body: some View {
         HStack {
             ZStack {
                 RoundedRectangle(cornerRadius: 3)
-                    .fill(lampi.state.color)
+                    .fill(device.state.color)
                     .shadow(radius: 2.0)
                     .frame(width: 50, height: 50)
                     .padding()
 
-                let imageName = lampi.state.isOn ? "lightbulb" : "lightbulb.slash"
+                let imageName = device.state.isOn ? "lightbulb" : "lightbulb.slash"
                 Image(systemName: imageName)
                     .imageScale(.large)
                     .foregroundColor(.white)
                     .shadow(radius: 2.0)
             }
 
-            Text("\(lampi.name)")
+            Text("\(device.name)")
 
             Spacer()
         }
@@ -131,7 +131,7 @@ private struct BLEScannerView: View {
                     )
             }
             Spacer()
-            Text("Scanning for Lampis")
+            Text("Scanning for Devices")
                 .foregroundColor(.white)
                 .padding()
                 .background(RoundedRectangle(cornerRadius: .infinity)

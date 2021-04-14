@@ -1,19 +1,19 @@
 //
-//  LampiManager.swift
+//  DeviceManager.swift
 //  Lampi
 //
 
 import Foundation
 import CoreBluetooth
 
-class LampiManager: NSObject, ObservableObject {
+class DeviceManager: NSObject, ObservableObject {
     @Published var isScanning = true
 
-    var foundLampis: [Lampi] {
-        return Array(lampis.values)
+    var foundDevices: [Lampi] {
+        return Array(devices.values)
     }
 
-    private var lampis = [String: Lampi]()
+    private var devices = [String: Lampi]()
 
     private var bluetoothManager: CBCentralManager!
 
@@ -23,8 +23,8 @@ class LampiManager: NSObject, ObservableObject {
     }
 }
 
-extension LampiManager: CBCentralManagerDelegate {
-    func scanForLampis() {
+extension DeviceManager: CBCentralManagerDelegate {
+    func scanForDevices() {
         if bluetoothManager.state == .poweredOn {
             isScanning = true
             print("Scanning for Lampis")
@@ -35,27 +35,27 @@ extension LampiManager: CBCentralManagerDelegate {
 
     private func scheduleStopScan() {
         Timer.scheduledTimer(withTimeInterval: 5, repeats: false) { [weak self] _ in
-            if !(self?.lampis.isEmpty ?? true) {
+            if !(self?.devices.isEmpty ?? true) {
                 self?.bluetoothManager.stopScan()
                 self?.isScanning = false
             } else {
-                print("Still scanning for lampis")
+                print("Still scanning for devices")
                 self?.scheduleStopScan()
             }
         }
     }
 
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        scanForLampis()
+        scanForDevices()
     }
 
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
 
         if let peripheralName = peripheral.name {
-            print("Manager found Lampi: \(peripheralName)")
+            print("Manager found device: \(peripheralName)")
 
             let lampi = Lampi(lampiPeripheral: peripheral)
-            lampis[peripheralName] = lampi
+            devices[peripheralName] = lampi
 
             bluetoothManager.connect(peripheral)
         }
@@ -68,7 +68,7 @@ extension LampiManager: CBCentralManagerDelegate {
 
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         if let peripheralName = peripheral.name,
-           let lampi = lampis[peripheralName] {
+           let lampi = devices[peripheralName] {
             print("Manager Disconnected from peripheral \(peripheral)")
 
             lampi.state.isConnected = false

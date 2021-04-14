@@ -30,34 +30,30 @@ struct LampiView: View {
                                handleColor: lamp.state.baseHueColor,
                                trackColors: Color.rainbow()) { hueValue in
 
-                    Mixpanel.mainInstance().trackUIEvent("Slider Change",
-                                                         properties: ["slider": "hue-slider", "value": hueValue])
+                    trackSliderEvent("hue-slider", value: hueValue)
                 }
 
                 GradientSlider(value: $lamp.state.saturation,
                                handleColor: Color(hue: lamp.state.hue,
                                                   saturation: lamp.state.saturation,
                                                   brightness: 1.0),
-                               trackColors: [.white, lamp.state.baseHueColor]) { satValue in
-                    
-                    Mixpanel.mainInstance().trackUIEvent("Slider Change",
-                                                         properties: ["slider": "saturation-slider", "value": satValue])
+                               trackColors: [.white, lamp.state.baseHueColor]) { saturationValue in
+
+                    trackSliderEvent("saturation-slider", value: saturationValue)
                 }
-                
+
                 GradientSlider(value: $lamp.state.brightness,
                                handleColor: Color(white: lamp.state.brightness),
                                handleImage: Image(systemName: "sun.max"),
                                trackColors: [.black, .white]) { brightnessValue in
-                    
-                    Mixpanel.mainInstance().trackUIEvent("Slider Change",
-                                                         properties: ["slider": "brightness-slider", "value": brightnessValue])
+
+                    trackSliderEvent("brightness-slider", value: brightnessValue)
                 }
-                    .foregroundColor(Color(white: 1.0 - lamp.state.brightness))
-                
+                .foregroundColor(Color(white: 1.0 - lamp.state.brightness))
             }.padding(.horizontal)
 
             Button(action: {
-                lamp.state.isOn = !lamp.state.isOn
+                lamp.state.isOn.toggle()
                 Mixpanel.mainInstance().trackUIEvent("Toggle Power",
                                                      properties: ["isOn": lamp.state.isOn])
             }) {
@@ -82,6 +78,11 @@ struct LampiView: View {
                             .foregroundColor(.white)
                             .shadow(radius: 2.0)
                     })
+    }
+
+    private func trackSliderEvent(_ sliderName: String, value: Double) {
+        Mixpanel.mainInstance().trackUIEvent("Slider Change",
+                                             properties: ["slider": sliderName, "value": value])
     }
 }
 
