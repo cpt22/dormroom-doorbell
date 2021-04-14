@@ -19,7 +19,7 @@ function LampiPage($){
 
         onConnect : function(response) {
           obj.client.subscribe("devices/" + deviceId + "/lamp/changed", {qos:1});
-          obj.client.subscribe("$SYS/broker/connection/" + deviceId + "_broker/state", {qos:1});
+          obj.client.subscribe("$SYS/broker/connection/" + deviceId + "_lampi_broker/state", {qos:1});
         },
 
         onConnectionLost : function(responseObject) {
