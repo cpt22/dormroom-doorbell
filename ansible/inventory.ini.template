@@ -9,7 +9,7 @@ lampi ansible_user=pi ansible_ssh_host=<IP>
 
 # replace <IP> with the IP address (or DNS) of your EC2 instance
 #  (e.g., "ansible_ssh_host=10.0.1.34")
-ec2  ansible_user=ubuntu ansible_ssh_host=<IP>
+ec2  ansible_user=ubuntu ansible_ssh_host=18.232.7.159
 
 # replace <IP> with the IP address (or DNS) of your doorbell
 #  (e.g., "ansible_ssh_host=10.0.1.34")
