@@ -49,11 +49,14 @@ class DoorbellEventView(APIView):
 
         if event_serializer.is_valid():
             event_serializer.save()
+            filename = event_serializer.data['recording'].replace('/recordings/', '')
+            print(filename)
+            event = DoorbellEvent.objects.filter(recording__endswith=filename)
+            if event:
+                event[0].transcribe_and_push_notification()
+            else:
+                print("Unknown doorbell -- error")
+
             return Response(event_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(event_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-#class DoorbellEventView(viewsets.ModelViewSet):
-#    serializer_class = DoorbellEventSerializer
-#    queryset = To

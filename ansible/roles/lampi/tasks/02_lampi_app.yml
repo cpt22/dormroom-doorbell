@@ -1,6 +1,7 @@
 - name: install our repo
-  become: no # need to explicitly do this to allow SSH host key forwarding
+  become: no # need to explicitly do this to allow SSH host key forwarding'
   git:
+    force: true
     repo:  "{{ connected_devices_git_repo_url }}"
     dest: "{{ repo_directory }}"
     version: "{{ connected_devices_git_repo_version }}"

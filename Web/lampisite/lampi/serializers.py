@@ -6,3 +6,4 @@ class DoorbellEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = DoorbellEvent
         fields = ('device_id', 'recording')
+        read_only_fields = ('transcription',)

@@ -4,6 +4,7 @@ import pigpio
 import paho.mqtt.client as mqtt
 import shelve
 import colorsys
+import time
 
 from lamp_common import *
 
@@ -20,10 +21,14 @@ MQTT_CLIENT_ID = "lamp_service"
 
 FP_DIGITS = 2
 
+FLASH_DELAY = 0.3
+
 
 class InvalidLampConfig(Exception):
     pass
 
+class InvalidNotificationStructure(Exception):
+    pass
 
 class LampDriver(object):
 
@@ -65,6 +70,8 @@ class LampService(object):
         client.on_connect = self.on_connect
         client.message_callback_add(TOPIC_SET_LAMP_CONFIG,
                                     self.on_message_set_config)
+        client.message_callback_add(TOPIC_NOTIFICATION,
+                                    self.on_notification)
         client.on_message = self.default_on_message
         return client
 
@@ -78,6 +85,7 @@ class LampService(object):
         self._client.publish(client_state_topic(MQTT_CLIENT_ID), "1",
                              qos=2, retain=True)
         self._client.subscribe(TOPIC_SET_LAMP_CONFIG, qos=1)
+        self._client.subscribe(TOPIC_NOTIFICATION, qos=2)
         # publish current lamp state at startup
         self.publish_config_change()
 
@@ -100,6 +108,20 @@ class LampService(object):
             self.publish_config_change()
         except InvalidLampConfig:
             print("error applying new settings " + str(msg.payload))
+
+    def on_notification(self, client, userdata, msg):
+        payload = json.loads(msg.payload.decode('utf-8'))
+        try:
+            if 'type' not in payload:
+                raise InvalidNotificationStructure()
+
+            if payload['type'] == 'doorbell_event':
+                self.handle_doorbell_event(payload)
+            else:
+                raise InvalidNotificationStructure()
+
+        except InvalidNotificationStructure:
+            print("Error reading notification")
 
     def publish_config_change(self):
         config = {'color': self.get_current_color(),
@@ -163,6 +185,39 @@ class LampService(object):
             r, g, b = tuple(channel * pwm * brightness
                             for channel in rgb)
         return r, g, b
+
+    def handle_doorbell_event(self, message):
+        try:
+            hue = 1.0
+            saturation = 1.0
+            brightness = 1.0
+            num_flashes = 5
+            if 'hue' in message:
+                hue = self.convert_to_lamp_values(message['hue'])
+            if 'saturation' in message:
+                saturation = self.convert_to_lamp_values(message['saturation'])
+            if 'brightness' in message:
+                brightness = self.convert_to_lamp_values(message['brightness'])
+            if 'num_flashes' in message:
+                num_flashes = message['num_flashes']
+            self.do_flashing(hue, saturation, brightness, num_flashes)
+        except InvalidNotificationStructure:
+            print("Error reading notification")
+
+    def convert_to_lamp_values(self, value):
+        if value < 0 or value > 1.0:
+            raise InvalidLampConfig()
+        return round(value, FP_DIGITS)
+
+    def do_flashing(self, hue, saturation, brightness, num_flashes):
+        r, g, b = self.calculate_rgb(hue, saturation, brightness, True)
+        for _ in range(0, num_flashes):
+            print("Thing")
+            self.lamp_driver.change_color(r, g, b)
+            time.sleep(FLASH_DELAY)
+            self.lamp_driver.change_color(0, 0, 0)
+            time.sleep(FLASH_DELAY)
+        self.write_current_settings_to_hardware()
 
 
 if __name__ == '__main__':
