@@ -16,8 +16,8 @@ MQTT_CLIENT_ID = "lamp_ui"
 
 
 class NotificationPopup(Popup):
-    title = StringProperty("Title")
-    message = StringProperty("Message")
+    title = StringProperty("No Message")
+    message = StringProperty("")
 
 
 class LampiApp(App):
@@ -56,6 +56,7 @@ class LampiApp(App):
     device_associated = BooleanProperty(True)
 
     notification_title = NotificationPopup()
+    _notification_popup_scheduler = None
 
     def on_start(self):
         self._publish_clock = None
@@ -74,7 +75,6 @@ class LampiApp(App):
         self.associated_status_popup = self._build_associated_status_popup()
         self.associated_status_popup.bind(on_open=self.update_popup_associated)
         self.notification_popup = NotificationPopup()
-        self.notification_popup.open()
         Clock.schedule_interval(self._poll_associated, 0.1)
 
     def _build_associated_status_popup(self):
@@ -146,11 +146,16 @@ class LampiApp(App):
         notification = json.loads(message.payload.decode('utf-8'))
         if 'type' not in notification:
             return
+
+        if self._notification_popup_scheduler is not None:
+            self._notification_popup_scheduler.cancel()
+
         if notification['type'] == 'doorbell_event':
+            popup = NotificationPopup()
             self.notification_popup.title = notification['title']
             self.notification_popup.message = notification['message']
             self.notification_popup.open()
-            Clock.schedule_once(self.notification_popup.dismiss, 10.0)
+            self._notification_popup_scheduler = Clock.schedule_once(self.notification_popup.dismiss, 10.0)
 
     def on_device_associated(self, instance, value):
         if value:
@@ -240,21 +245,10 @@ class LampiApp(App):
         if value:
             self.notification_popup.open()
         else:
-            self.notification_popup.dismiss()
+            pass
+            #self.notification_popup.dismiss()
 
     def _poll_GPIO(self, dt):
         # GPIO17 is the rightmost button when looking front of LAMPI
         self.gpio17_pressed = not self.pi.read(17)
         self.gpio22_pressed = not self.pi.read(22)
-
-    def _build_notification_message_popup(self):
-        return Popup(title="Title",
-                     content=Label(text="Message"),
-                     size_hint=(1, 1), auto_dismiss=False)
-
-    def update_notification_popup(self, instance):
-        instance.content.title = self.notification_title
-        instance.content.text = self.notification_message
-
-    def _close_notification_popup(self, instance):
-        self.notification_popup.dismiss()

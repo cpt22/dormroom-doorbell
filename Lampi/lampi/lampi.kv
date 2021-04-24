@@ -11,12 +11,29 @@
 
 <NotificationPopup>:
     title: root.title
+    title_size: '25sp'
     auto_dismiss: False
-    Label:
-        text: root.message
-        size_hint_y: None
-        text_size: self.width, None
-        height: self.texture_size[1]
+    BoxLayout:
+        orientation: 'vertical'
+        padding: 2
+        BoxLayout:
+            orientation: 'vertical'
+            padding: 2, 10, 2, 10
+            ScrollView:
+                do_scroll_y: True
+                do_scroll_x: False
+                size_hint_y: 0.75
+                Label:
+                    text: root.message
+                    font_size: '24sp'
+                    size_hint_y: None
+                    text_size: self.width, None
+                    height: self.texture_size[1]
+        Button:
+            text: 'Close'
+            size_hint_y: 0.25
+            on_release: root.dismiss()
+
 
 BoxLayout:
     canvas.before:
