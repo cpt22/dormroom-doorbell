@@ -141,7 +141,7 @@ class DoorbellEvent(models.Model):
 
                         notification_message = {
                             'type': 'doorbell_event',
-                            'doorbell_name': doorbell.name,
+                            'title': doorbell.name,
                             'message': self.transcription,
                             'hue': float(link.hue),
                             'saturation': float(link.saturation),

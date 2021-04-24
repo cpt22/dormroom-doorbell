@@ -1,6 +1,6 @@
 import platform
 from kivy.app import App
-from kivy.properties import NumericProperty, AliasProperty, BooleanProperty
+from kivy.properties import NumericProperty, AliasProperty, BooleanProperty, StringProperty
 from kivy.clock import Clock
 from kivy.uix.popup import Popup
 from kivy.uix.label import Label
@@ -13,6 +13,11 @@ import lampi.lampi_util
 
 
 MQTT_CLIENT_ID = "lamp_ui"
+
+
+class NotificationPopup(Popup):
+    title = StringProperty("Title")
+    message = StringProperty("Message")
 
 
 class LampiApp(App):
@@ -47,7 +52,10 @@ class LampiApp(App):
     brightness = AliasProperty(_get_brightness, _set_brightness,
                                bind=['_brightness'])
     gpio17_pressed = BooleanProperty(False)
+    gpio22_pressed = BooleanProperty(False)
     device_associated = BooleanProperty(True)
+
+    notification_title = NotificationPopup()
 
     def on_start(self):
         self._publish_clock = None
@@ -65,6 +73,8 @@ class LampiApp(App):
         self.set_up_GPIO_and_network_status_popup()
         self.associated_status_popup = self._build_associated_status_popup()
         self.associated_status_popup.bind(on_open=self.update_popup_associated)
+        self.notification_popup = NotificationPopup()
+        self.notification_popup.open()
         Clock.schedule_interval(self._poll_associated, 0.1)
 
     def _build_associated_status_popup(self):
@@ -109,9 +119,12 @@ class LampiApp(App):
                                        self.receive_bridge_connection_status)
         self.mqtt.message_callback_add(TOPIC_LAMP_ASSOCIATED,
                                        self.receive_associated)
+        self.mqtt.message_callback_add(TOPIC_NOTIFICATION,
+                                       self.receive_notification)
         self.mqtt.subscribe(broker_bridge_connection_topic(), qos=1)
         self.mqtt.subscribe(TOPIC_LAMP_CHANGE_NOTIFICATION, qos=1)
         self.mqtt.subscribe(TOPIC_LAMP_ASSOCIATED, qos=2)
+        self.mqtt.subscribe(TOPIC_NOTIFICATION, qos=2)
 
     def _poll_associated(self, dt):
         # this polling loop allows us to synchronize changes from the
@@ -128,6 +141,16 @@ class LampiApp(App):
             else:
                 self.association_code = None
             self._associated = new_associated['associated']
+
+    def receive_notification(self, client, userdata, message):
+        notification = json.loads(message.payload.decode('utf-8'))
+        if 'type' not in notification:
+            return
+        if notification['type'] == 'doorbell_event':
+            self.notification_popup.title = notification['title']
+            self.notification_popup.message = notification['message']
+            self.notification_popup.open()
+            Clock.schedule_once(self.notification_popup.dismiss, 10.0)
 
     def on_device_associated(self, instance, value):
         if value:
@@ -188,6 +211,8 @@ class LampiApp(App):
         self.pi = pigpio.pi()
         self.pi.set_mode(17, pigpio.INPUT)
         self.pi.set_pull_up_down(17, pigpio.PUD_UP)
+        self.pi.set_mode(22, pigpio.INPUT)
+        self.pi.set_pull_up_down(22, pigpio.PUD_UP)
         Clock.schedule_interval(self._poll_GPIO, 0.05)
         self.network_status_popup = self._build_network_status_popup()
         self.network_status_popup.bind(on_open=self.update_popup_ip_address)
@@ -211,6 +236,25 @@ class LampiApp(App):
         else:
             self.network_status_popup.dismiss()
 
+    def on_gpio22_pressed(self, instance, value):
+        if value:
+            self.notification_popup.open()
+        else:
+            self.notification_popup.dismiss()
+
     def _poll_GPIO(self, dt):
         # GPIO17 is the rightmost button when looking front of LAMPI
         self.gpio17_pressed = not self.pi.read(17)
+        self.gpio22_pressed = not self.pi.read(22)
+
+    def _build_notification_message_popup(self):
+        return Popup(title="Title",
+                     content=Label(text="Message"),
+                     size_hint=(1, 1), auto_dismiss=False)
+
+    def update_notification_popup(self, instance):
+        instance.content.title = self.notification_title
+        instance.content.text = self.notification_message
+
+    def _close_notification_popup(self, instance):
+        self.notification_popup.dismiss()
