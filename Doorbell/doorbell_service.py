@@ -7,7 +7,8 @@ import requests
 import RPi.GPIO as GPIO
 import doorbell_util as util
 
-OUTPUT_PATH = "/home/pi/recordings/"
+#OUTPUT_PATH = "/home/pi/recordings/"
+OUTPUT_PATH = "/tmp/"
 OUTPUT_FILETYPE = "wav"
 RECORDING_TIME = 6
 
