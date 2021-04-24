@@ -1,7 +1,12 @@
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404
-from .models import Lampi
+from rest_framework.views import APIView
+from rest_framework.parsers import FileUploadParser
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Lampi, Doorbell, DoorbellEvent
+from .serializers import DoorbellEventSerializer
 from lampi.forms import AddDeviceForm
 
 
@@ -34,3 +39,21 @@ class AddDeviceView(LoginRequiredMixin, generic.FormView):
         device = form.cleaned_data['device']
         device.associate_and_publish_associated_msg(self.request.user)
         return super(AddDeviceView, self).form_valid(form)
+
+
+class DoorbellEventView(APIView):
+    parser_class = (FileUploadParser,)
+
+    def post(self, request, *args, **kwargs):
+        event_serializer = DoorbellEventSerializer(data=request.data)
+
+        if event_serializer.is_valid():
+            event_serializer.save()
+            return Response(event_serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            return Response(event_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+#class DoorbellEventView(viewsets.ModelViewSet):
+#    serializer_class = DoorbellEventSerializer
+#    queryset = To

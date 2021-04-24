@@ -11,7 +11,7 @@ OUTPUT_PATH = "/home/pi/recordings/"
 OUTPUT_FILETYPE = "wav"
 RECORDING_TIME = 5
 
-UPLOAD_URL = "http://192.168.100.100/upload"
+UPLOAD_URL = "http://ec2-18-232-7-159.compute-1.amazonaws.com/lampi/api/doorbellevent/"
 
 BUTTON_PIN = 7
 RGB_PINS = [22, 23, 24]
@@ -52,8 +52,8 @@ class webUpload(threading.Thread):
             response = requests.post(UPLOAD_URL,
                                      data=data,
                                      files=files)
-            if response.status_code == 200:
-                print("Request Successful")
+            if response.status_code == 201:
+                print("Upload Successful")
             elif response.status_code == 404:
                 print("Not Found")
             else:
