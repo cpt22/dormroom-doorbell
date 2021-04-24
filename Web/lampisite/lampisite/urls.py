@@ -17,14 +17,17 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from django.views.generic.base import RedirectView
+from django.views.generic.base import TemplateView
+from lampi.views import SignUpView
 
 urlpatterns = [
-    path('accounts/', include('accounts.urls')),
     path('lampi/', include('lampi.urls'), name='lampi'),
     path('admin/', admin.site.urls),
     path('login/', auth_views.LoginView.as_view(
          template_name='lampi/login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(
           template_name='lampi/logout.html'), name='logout'),
+    path('signup/', SignUpView.as_view(
+          template_name='lampi/signup.html'), name='signup'),
     path('', RedirectView.as_view(pattern_name='lampi:index'), name='root'),
 ]

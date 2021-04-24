@@ -1,7 +1,13 @@
-{% extends "lampi/base.html" %}
+<!-- templates/registration/signup.html -->
+{% extends 'lampi/base.html' %}
 
-{% block title %}Logged Out{% endblock %}
+{% block title %}Sign Up{% endblock %}
 
 {% block content %}
-  <p>Logged out</p>
+  <h2>Sign up</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Sign Up</button>
+  </form>
 {% endblock %}
