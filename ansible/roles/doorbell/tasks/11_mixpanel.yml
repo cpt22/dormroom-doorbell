@@ -7,6 +7,6 @@
 - name: install mixpanel credentials into mixpanel_settings.py
   template:
     src: 11_mixpanel_settings.py
-    dest: "{{ repo_directory }}/Doorbell/doorbell/mixpanel_settings.py"
+    dest: "{{ repo_directory }}/Doorbell/mixpanel_settings.py"
     force: no
 

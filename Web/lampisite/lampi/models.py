@@ -109,6 +109,9 @@ class LampiDoorbellLink(models.Model):
     brightness = models.DecimalField(decimal_places=2, max_digits=3, default=1.0)
     number_flashes = models.PositiveSmallIntegerField(default=5)
 
+    class Meta:
+        unique_together = ('doorbell', 'lampi',)
+
 
 class DoorbellEvent(models.Model):
     device_id = models.ForeignKey('Doorbell', related_name='doorbell', on_delete=models.CASCADE)#on_delete=models.SET("ffffffffffff"))

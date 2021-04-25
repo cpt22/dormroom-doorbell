@@ -9,3 +9,10 @@
     name: requests
     executable: pip3
     extra_args: --upgrade
+
+- name: install GPIO library
+  become: True
+  apt:
+    name: ['rpi.gpio']
+    cache_valid_time: "{{ cache_update_valid_secs }}"
+

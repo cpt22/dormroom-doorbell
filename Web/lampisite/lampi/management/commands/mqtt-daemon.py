@@ -103,8 +103,11 @@ class Command(BaseCommand):
         topic_lower = message.topic.lower()
         if "_doorbell_broker" in topic_lower:
             results = re.search(MQTT_DOORBELL_BROKER_RE_PATTERN, topic_lower)
-        else:
+        elif "_lampi_broker" in topic_lower:
             results = re.search(MQTT_LAMPI_BROKER_RE_PATTERN, topic_lower)
+        else:
+            print("Unknown Device Connecting")
+            return
         device_id = results.group('device_id')
         connection_state = 'unknown'
         if message.payload == b'1':
