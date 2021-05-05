@@ -121,14 +121,19 @@ class DoorbellEvent(models.Model):
 
     def transcribe_and_push_notification(self):
         print("Transcribing")
-        r = sr.Recognizer()
-        path = self.recording.path
-        file = sr.AudioFile(path)
-        with file as source:
-            audio = r.record(source)
+        text = "No Message"
+        try:
+            r = sr.Recognizer()
+            path = self.recording.path
+            file = sr.AudioFile(path)
+            with file as source:
+                audio = r.record(source)
 
-        text = r.recognize_google(audio)
-        print(text)
+            text = r.recognize_google(audio)
+            print(text)
+        except sr.UnknownValueError:
+            print("Unknown Value")
+
         self.transcription = text
         self.save()
         self.send_notification_to_associated_lampis()

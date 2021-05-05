@@ -12,9 +12,32 @@ from lampi.forms import AddDeviceForm
 
 class IndexView(LoginRequiredMixin, generic.ListView):
     template_name = 'lampi/index.html'
+    context_object_name = 'devices'
+
+    #def get_context_data(self, **kwargs):
+    #    lampi_queryset = kwargs.pop('lampi_list', self.lampi_list)
+    #    doorbell_queryset = kwargs.pop('doorbell_list', self.doorbell_list)
+
+    #    context = {
+    #        'paginator': None,
+    #        'page_obj': None,
+    #        'is_paginated': False,
+    #        'lampi_list':  lampi_queryset,
+    #        'doorbell_list': doorbell_queryset
+    #    }
+
+    #    context.update(kwargs)
+    #    return context
+
+    #def get(selfself, request, *args, **kwargs):
+    #    self.lampi_list = self.get_lampi_queryset()
+    #    self.doorbell_list = self.get_doorbell_queryset()
 
     def get_queryset(self):
-        results = Lampi.objects.filter(user=self.request.user)
+        results = {'lampis': Lampi.objects.filter(user=self.request.user),
+                   'doorbells': Doorbell.objects.filter(user=self.request.user)}
+        #lampis = Lampi.objects.filter(user=self.request.user)
+        #doorbells = Doorbell.objects.filter(user=self.request.user)
         print("RESULTS: {}".format(results))
         return results
 

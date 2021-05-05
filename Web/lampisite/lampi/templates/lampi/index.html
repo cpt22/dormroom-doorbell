@@ -1,20 +1,32 @@
 {% extends "lampi/base.html" %}
 
 {% block content %}
+<div class="col-6">
+    <h3>Lampis</h3>
+    {% if devices.lampis %}
+        <div class="list-group">
+        {% for lampi in devices.lampis %}
+           <a href="{% url 'lampi:detail' lampi.device_id %}" class="list-group-item list-group-item-action">
+            {{ lampi.name }} : {{ lampi.device_id }}</a>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p>No Lampi Devices are available.</p>
+    {% endif %}
 
-{% if lampi_list %}
-    <ul>
-    {% for device in lampi_list %}
-       <li><a href="{% url 'lampi:detail' device.device_id %}">
-        {{ device.name }} {{device.device_id }}</a></li>
-    {% endfor %}
-    </ul>
-    <a href="{% url 'lampi:add' %}">Add a LAMPI Device</a>
-{% else %}
-    <p>No devices are available.</p>
-    <a href="{% url 'lampi:add' %}">Add a LAMPI Device</a>
-{% endif %}
-
+    <br>
+    <h3>Doorbells</h3>
+    {% if devices.doorbells %}
+        <div class="list-group">
+        {% for doorbell in devices.doorbells %}
+           <a href="{% url 'lampi:detail' doorbell.device_id %}" class="list-group-item list-group-item-action">
+            {{ doorbell.name }} : {{ doorbell.device_id }}</a>
+        {% endfor %}
+        </div>
+    {% else %}
+        <p>No Lampi Devices are available.</p>
+    {% endif %}
+</div>
 {% endblock %}
 
 {% block page_event %}LAMPI List{% endblock %}

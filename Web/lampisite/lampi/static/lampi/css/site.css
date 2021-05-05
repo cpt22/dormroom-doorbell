@@ -1,4 +1,4 @@
-html, body {
+/*html, body {
   width: 100%;
   height: 100%;
   background-color: #1A1A1A;
@@ -6,12 +6,7 @@ html, body {
 
 a, h2, label, p {
     color: white;
-}
-
-.errorlist {
-    color: red;
-}
-
+}*/
 
 .centered-root {
   position: absolute;
@@ -21,6 +16,13 @@ a, h2, label, p {
   bottom: 0;
   margin: auto;
 }
+
+.errorlist {
+    color: red;
+}
+
+
+
 
 .toggle-button {
   height: 40px;

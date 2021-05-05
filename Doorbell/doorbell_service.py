@@ -10,7 +10,7 @@ import doorbell_util as util
 #OUTPUT_PATH = "/home/pi/recordings/"
 OUTPUT_PATH = "/tmp/"
 OUTPUT_FILETYPE = "wav"
-RECORDING_TIME = 6
+RECORDING_TIME = 5
 
 UPLOAD_URL = "http://ec2-18-232-7-159.compute-1.amazonaws.com/lampi/api/doorbellevent/"
 
