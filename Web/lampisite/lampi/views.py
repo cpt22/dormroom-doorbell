@@ -14,43 +14,35 @@ class IndexView(LoginRequiredMixin, generic.ListView):
     template_name = 'lampi/index.html'
     context_object_name = 'devices'
 
-    #def get_context_data(self, **kwargs):
-    #    lampi_queryset = kwargs.pop('lampi_list', self.lampi_list)
-    #    doorbell_queryset = kwargs.pop('doorbell_list', self.doorbell_list)
-
-    #    context = {
-    #        'paginator': None,
-    #        'page_obj': None,
-    #        'is_paginated': False,
-    #        'lampi_list':  lampi_queryset,
-    #        'doorbell_list': doorbell_queryset
-    #    }
-
-    #    context.update(kwargs)
-    #    return context
-
-    #def get(selfself, request, *args, **kwargs):
-    #    self.lampi_list = self.get_lampi_queryset()
-    #    self.doorbell_list = self.get_doorbell_queryset()
-
     def get_queryset(self):
         results = {'lampis': Lampi.objects.filter(user=self.request.user),
                    'doorbells': Doorbell.objects.filter(user=self.request.user)}
-        #lampis = Lampi.objects.filter(user=self.request.user)
-        #doorbells = Doorbell.objects.filter(user=self.request.user)
         print("RESULTS: {}".format(results))
         return results
 
 
-class DetailView(LoginRequiredMixin, generic.TemplateView):
-    template_name = 'lampi/detail.html'
+class LampiDetailView(LoginRequiredMixin, generic.TemplateView):
+    template_name = 'lampi/lampidetail.html'
 
     def get_context_data(self, **kwargs):
-        context = super(DetailView, self).get_context_data(**kwargs)
+        context = super(LampiDetailView, self).get_context_data(**kwargs)
         context['device'] = get_object_or_404(
             Lampi, pk=kwargs['device_id'], user=self.request.user)
         print("CONTEXT: {}".format(context))
         return context
+
+
+class DoorbellDetailView(LoginRequiredMixin, generic.ListView):
+    template_name = 'lampi/doorbelldetail.html'
+    context_object_name = 'data'
+
+    def get_queryset(self):
+        doorbell = get_object_or_404(Doorbell, pk=self.kwargs['device_id'], user=self.request.user)
+        results = {'doorbell': doorbell,
+                   'events': DoorbellEvent.objects.filter(device_id=doorbell.device_id)
+                   .order_by('-time')}
+        print(results)
+        return results
 
 
 class AddDeviceView(LoginRequiredMixin, generic.FormView):

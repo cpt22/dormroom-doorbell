@@ -114,7 +114,7 @@ class LampiDoorbellLink(models.Model):
 
 
 class DoorbellEvent(models.Model):
-    device_id = models.ForeignKey('Doorbell', related_name='doorbell', on_delete=models.CASCADE)#on_delete=models.SET("ffffffffffff"))
+    device_id = models.ForeignKey('Doorbell', related_name='doorbell', on_delete=models.CASCADE)
     time = models.DateTimeField(default=timezone.now)
     recording = models.FileField(blank=False, null=False)
     transcription = models.TextField()

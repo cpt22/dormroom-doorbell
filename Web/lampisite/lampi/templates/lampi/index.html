@@ -6,7 +6,7 @@
     {% if devices.lampis %}
         <div class="list-group">
         {% for lampi in devices.lampis %}
-           <a href="{% url 'lampi:detail' lampi.device_id %}" class="list-group-item list-group-item-action">
+           <a href="{% url 'lampi:lampidetail' lampi.device_id %}" class="list-group-item list-group-item-action">
             {{ lampi.name }} : {{ lampi.device_id }}</a>
         {% endfor %}
         </div>
@@ -19,7 +19,7 @@
     {% if devices.doorbells %}
         <div class="list-group">
         {% for doorbell in devices.doorbells %}
-           <a href="{% url 'lampi:detail' doorbell.device_id %}" class="list-group-item list-group-item-action">
+           <a href="{% url 'lampi:doorbelldetail' doorbell.device_id %}" class="list-group-item list-group-item-action">
             {{ doorbell.name }} : {{ doorbell.device_id }}</a>
         {% endfor %}
         </div>
