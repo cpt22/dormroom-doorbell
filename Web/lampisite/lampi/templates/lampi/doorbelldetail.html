@@ -2,22 +2,22 @@
 
 {% block content %}
 <div class="col-8">
-    <div id="doorbell-name" class="row">
+    <div id="device-name" class="row">
         <div class="d-flex col-6">
             <h3 class="me-4">{{ data.doorbell.name }}</h3>
-            <button id="edit-doorbell-name-button" type="button" class="btn btn-secondary me-auto">
+            <button id="edit-device-name-button" type="button" class="btn btn-secondary me-auto">
                 <i class="bi bi-pencil"></i>
             </button>
         </div>
     </div>
-    <form id="edit-doorbell-name-form" action="" method="post">
+    <form id="edit-device-name-form" action="" method="post">
         {% csrf_token %}
         <div class="input-group">
             <input type="text" name="name" class="form-control" placeholder="Name" value="{{ data.doorbell.name }}">
             <button class="btn btn-success" type="submit">
                 <i class="bi bi-check2"></i>
             </button>
-            <button id="cancel-edit-doorbell-name" class="btn btn-danger" type="button">
+            <button id="cancel-edit-device-name" class="btn btn-danger" type="button">
                 <i class="bi bi-x"></i>
             </button>
         </div>

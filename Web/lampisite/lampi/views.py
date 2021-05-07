@@ -17,8 +17,8 @@ import json
 from django.core import serializers
 
 
-def user_has_device(user):
-    if Lampi.objects.filter(user=user) or Doorbell.objects.filter(user=user):
+def user_has_device(user, device_id):
+    if Lampi.objects.filter(user=user, pk=device_id) or Doorbell.objects.filter(user=user, pk=device_id):
         return True
     return False
 
@@ -33,8 +33,11 @@ class IndexView(LoginRequiredMixin, generic.ListView):
         return results
 
 
-class LampiDetailView(LoginRequiredMixin, generic.TemplateView):
+class LampiDetailView(LoginRequiredMixin, FormMixin, generic.TemplateView):
     template_name = 'lampi/lampidetail.html'
+    form_class = DeviceNameForm
+    base_url = '/lampi/device/lampi/'
+    success_url = '/lampi/device/lampi'
 
     def get_context_data(self, **kwargs):
         context = super(LampiDetailView, self).get_context_data(**kwargs)
@@ -43,11 +46,28 @@ class LampiDetailView(LoginRequiredMixin, generic.TemplateView):
         print("CONTEXT: {}".format(context))
         return context
 
+    def post(self, request, *args, **kwargs):
+        if not (request.user.is_authenticated and user_has_device(request.user, kwargs['device_id'])):
+            return HttpResponseForbidden()
+        form = self.get_form()
+        self.success_url = self.base_url + kwargs['device_id']
+        if form.is_valid():
+            return self.form_valid(form, **kwargs)
+        else:
+            return self.form_invalid(form)
+
+    def form_valid(self, form, **kwargs):
+        name = form.cleaned_data['name']
+        lampi = Lampi.objects.get(pk=kwargs['device_id'], user=self.request.user)
+        lampi.name = name
+        lampi.save()
+        return super().form_valid(form)
+
 
 class DoorbellDetailView(LoginRequiredMixin, FormMixin, generic.ListView):
     template_name = 'lampi/doorbelldetail.html'
     context_object_name = 'data'
-    form_class = DoorbellNameForm
+    form_class = DeviceNameForm
     base_url = '/lampi/device/doorbell/'
     success_url = '/lampi/device/doorbell'
 
@@ -55,11 +75,11 @@ class DoorbellDetailView(LoginRequiredMixin, FormMixin, generic.ListView):
         doorbell = get_object_or_404(Doorbell, pk=self.kwargs['device_id'], user=self.request.user)
         results = {'doorbell': doorbell,
                    'events': DoorbellEvent.objects.filter(device_id=doorbell.device_id)
-                   .order_by('-time')}
+                       .order_by('-time')}
         return results
 
     def post(self, request, *args, **kwargs):
-        if not (request.user.is_authenticated and user_has_device(request.user)):
+        if not (request.user.is_authenticated and user_has_device(request.user, kwargs['device_id'])):
             return HttpResponseForbidden()
         form = self.get_form()
         self.success_url = self.base_url + kwargs['device_id']
@@ -90,7 +110,6 @@ class LinkView(LoginRequiredMixin, generic.ListView):
             links = LampiDoorbellLink.objects.filter(doorbell=doorbell)
             print(links)
             for link in links:
-                print(link)
                 results['links'].append(link)
         print(results)
         return results
@@ -104,6 +123,8 @@ class AddDeviceView(LoginRequiredMixin, generic.FormView):
     def form_valid(self, form):
         device = form.cleaned_data['device']
         device.associate_and_publish_associated_msg(self.request.user)
+        device.name = self.request.POST['name']
+        device.save()
         return super(AddDeviceView, self).form_valid(form)
 
 
@@ -126,6 +147,39 @@ class DoorbellEventView(APIView):
             return Response(event_serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(event_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+def dissociate_device(request):
+    if not request.user.is_authenticated:
+        return HttpResponseForbidden()
+
+    data = request.POST
+    if 'device_id' not in data:
+        return HttpResponse("{}", status=status.HTTP_400_BAD_REQUEST)
+
+    lampi = None
+    doorbell = None
+    try:
+        doorbell = Doorbell.objects.get(pk=data['device_id'])
+        if not user_has_device(request.user, doorbell.device_id):
+            return HttpResponseForbidden()
+        doorbell.dissociate()
+    except Doorbell.DoesNotExist:
+        doorbell = None
+
+    try:
+        lampi = Lampi.objects.get(pk=data['device_id'])
+        if not user_has_device(request.user, lampi.device_id):
+            return HttpResponseForbidden()
+        lampi.dissociate()
+    except Lampi.DoesNotExist:
+        lampi = None
+
+    if doorbell is not None or lampi is not None:
+        return HttpResponse("{}", status=status.HTTP_200_OK)
+    else:
+        return HttpResponse("{}", status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -158,39 +212,33 @@ def update_link_entry(request):
 
     link = None
     try:
-        try:
-            link = LampiDoorbellLink.objects.get(doorbell=doorbell, lampi=lampi)
-            if 'is_add' in data and data['is_add'] == "false":
-                response['outcome'] = "updated"
-            else:
-                response['outcome'] = "failed"
+        link = LampiDoorbellLink.objects.get(doorbell=doorbell, lampi=lampi)
+        if 'is_add' in data and data['is_add'] == "false":
+            response['outcome'] = "updated"
+        else:
+            response['outcome'] = "failed"
+            response['message'] = "Link already exists!"
 
-        except LampiDoorbellLink.DoesNotExist:
-            link = LampiDoorbellLink(doorbell=doorbell, lampi=lampi)
+    except LampiDoorbellLink.DoesNotExist:
+        link = LampiDoorbellLink(doorbell=doorbell, lampi=lampi)
 
-            if 'is_add' in data and data['is_add'] == "true":
-                response['outcome'] = "created"
-            else:
-                response['outcome'] = "failed"
-                response['message'] = "Link already exists!"
+        if 'is_add' in data and data['is_add'] == "true":
+            response['outcome'] = "created"
+        else:
+            response['outcome'] = "failed"
+            response['message'] = "An error has occurred!"
 
-        if response['outcome'] == "failed":
-            raise Exception()
-
-        if 'hue' in data:
-            link.hue = data['hue']
-        if 'saturation' in data:
-            link.saturation = data['saturation']
-        if 'brightness' in data:
-            link.brightness = data['brightness']
-        if 'number_flashes' in data:
-            link.number_flashes = data['number_flashes']
-
-        response['obj'] = serializers.serialize("json", link)
-        link.save()
+    if response['outcome'] == "failed":
         return HttpResponse(json.dumps(response), status=status.HTTP_200_OK)
-    except Exception as e:
-        return HttpResponse(json.dumps(response), status=status.HTTP_200_OK)
+
+    if 'color' in data:
+        link.set_hex_color(data['color'])
+    if 'number_flashes' in data:
+        link.number_flashes = data['number_flashes']
+
+    link.save()
+    response['link'] = link.to_dict()
+    return HttpResponse(json.dumps(response), status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -228,4 +276,5 @@ def delete_link_entry(request):
     except LampiDoorbellLink.DoesNotExist:
         response['outcome'] = "failed"
         response['message'] = "Failed to delete link!"
-        return HttpResponse(json.dumps(response), status=status.HTTP_200_OK)
+
+    return HttpResponse(json.dumps(response), status=status.HTTP_200_OK)

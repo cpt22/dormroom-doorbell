@@ -9,17 +9,19 @@ def device_association_topic(device_id):
     return 'devices/{}/lamp/associated'.format(device_id)
 
 
-class DoorbellNameForm(forms.Form):
+class DeviceNameForm(forms.Form):
     name = forms.CharField()
 
     def clean(self):
-        cleaned_data = super(DoorbellNameForm, self).clean()
+        cleaned_data = super(DeviceNameForm, self).clean()
         return cleaned_data
 
 
 class AddDeviceForm(forms.Form):
+    name = forms.CharField(label="Name", min_length=2, max_length=30)
     association_code = forms.CharField(label="Association Code", min_length=6,
                                        max_length=6)
+
 
     def clean(self):
         cleaned_data = super(AddDeviceForm, self).clean()

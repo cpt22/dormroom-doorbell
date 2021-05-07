@@ -21,17 +21,45 @@
         window_global['mqtt'] = {'hostname': window.location.hostname,
                                 'websockets_port': 50002};
     </script>
-    <div class="border border-dark border-1 mt-5" style="height:350px; width:275px">
-        <div id="top-pane">
-            <div id="sliders">
-                <input id="hue-slider" class="hue slider" type="range" min="0.0" max="1.0" step="0.01"></input>
-                <input id="saturation-slider" class="saturation slider" type="range" min="0.0" max="1.0" step="0.01"></input>
-                <input id="brightness-slider" class="brightness slider" type="range" min="0.0" max="1.0" step="0.01"></input>
+    <span id="device-id" data-device-id="{{ device.device_id }}"></span>
+    <div class="justify-content-center">
+        <div id="device-name">
+            <div class="d-flex col">
+                <h3 class="me-4">{{ device.name }}</h3>
+                <button id="edit-device-name-button" type="button" class="btn btn-secondary me-auto">
+                    <i class="bi bi-pencil"></i>
+                </button>
             </div>
         </div>
-        <div id="colorbox"></div>
-        <div id="bottom-pane">
-            <div class="toggle-button" id="power"></div>
+        <form id="edit-device-name-form" action="" method="post">
+            {% csrf_token %}
+            <div class="input-group">
+                <input type="text" name="name" class="form-control" placeholder="Name" value="{{ device.name }}">
+                <button class="btn btn-success" type="submit">
+                    <i class="bi bi-check2"></i>
+                </button>
+                <button id="cancel-edit-device-name" class="btn btn-danger" type="button">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+        </form>
+
+        <div class="border border-dark border-1 mt-5" style="height:350px; width:275px">
+            <div id="top-pane">
+                <div id="sliders">
+                    <input id="hue-slider" class="hue slider" type="range" min="0.0" max="1.0" step="0.01">
+                    <input id="saturation-slider" class="saturation slider" type="range" min="0.0" max="1.0" step="0.01">
+                    <input id="brightness-slider" class="brightness slider" type="range" min="0.0" max="1.0" step="0.01">
+                </div>
+            </div>
+            <div id="colorbox"></div>
+            <div id="bottom-pane">
+                <div class="toggle-button" id="power"></div>
+            </div>
+        </div>
+        <br>
+        <div id="dissociation">
+            <button id="dissociate-button" type="button" class="btn btn-danger">Dissociate</button>
         </div>
     </div>
 

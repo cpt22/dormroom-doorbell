@@ -1,10 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.utils import timezone
 from uuid import uuid4
 import speech_recognition as sr
 import json
 import paho.mqtt.publish
+import colorsys
 
 # Create your models here.
 DEFAULT_USER = 'parked_device_user'
@@ -48,8 +50,22 @@ class Lampi(models.Model):
     def __str__(self):
         return "{}: {}".format(self.device_id, self.name)
 
+    def to_dict(self):
+        dct = {
+            'name': self.name,
+            'device_id': self.device_id
+        }
+        return dct
+
     #def _generate_device_association_topic(self):
     #    return 'devices/{}/lamp/associated'.format(self.device_id)
+    def dissociate(self):
+        self.user = get_parked_user()
+        self.association_code = generate_association_code()
+        self.doorbells.clear()
+        self.save()
+        self.publish_unassociated_msg()
+        print(self.doorbells.all())
 
     def publish_unassociated_msg(self):
         # send association MQTT message
@@ -84,6 +100,19 @@ class Doorbell(models.Model):
     def __str__(self):
         return "{}: {}".format(self.device_id, self.name)
 
+    def to_dict(self):
+        dct = {
+            'name': self.name,
+            'device_id': self.device_id
+        }
+        return dct
+
+    def dissociate(self):
+        self.user = get_parked_user()
+        self.association_code = generate_association_code()
+        self.save()
+        self.publish_unassociated_msg()
+
     def publish_unassociated_msg(self):
         # send association MQTT message
         assoc_msg = {}
@@ -111,6 +140,40 @@ class LampiDoorbellLink(models.Model):
 
     class Meta:
         unique_together = ('doorbell', 'lampi',)
+
+    @property
+    def hex_color(self):
+        rgb = colorsys.hsv_to_rgb(float(self.hue), float(self.saturation), float(self.brightness))
+        r = int(rgb[0] * 255)
+        g = int(rgb[1] * 255)
+        b = int(rgb[2] * 255)
+        return '#%02x%02x%02x' % (r, g, b)
+
+    def set_hex_color(self, hex_color):
+        rgb_color = self.hex_to_rgb(hex_color)
+        scaled = (rgb_color[0] / 255.0, rgb_color[1] / 255.0, rgb_color[2] / 255.0)
+        hsv_color = colorsys.rgb_to_hsv(scaled[0], scaled[1], scaled[2])
+        self.hue = hsv_color[0]
+        self.saturation = hsv_color[1]
+        self.brightness = hsv_color[2]
+        print(hsv_color)
+
+    def to_dict(self):
+        print("here")
+        print(self.doorbell.to_dict())
+        dct = {'doorbell': self.doorbell.to_dict(),
+                'lampi': self.lampi.to_dict(),
+                'hue': float(self.hue),
+                'saturation': float(self.saturation),
+                'brightness': float(self.brightness),
+                'hex_color': self.hex_color,
+                'number_flashes': self.number_flashes}
+        return dct
+
+    def hex_to_rgb(self, value):
+        value = value.lstrip('#')
+        lv = len(value)
+        return tuple(int(value[i:i + lv // 3], 16) for i in range(0, lv, lv // 3))
 
 
 class DoorbellEvent(models.Model):

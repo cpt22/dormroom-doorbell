@@ -9,7 +9,7 @@
 <div class="col-10">
     <div id="alert-container">
     </div>
-    <table class="table table-striped table-hover">
+    <table class="table table-striped table-hover" id="linkTable">
         <thead>
             <tr>
                 <th scope="col">Doorbell</th>
@@ -27,14 +27,12 @@
                     <td><a href="{% url 'lampi:lampidetail' link.lampi.device_id %}">{{ link.lampi.name }}</a></td>
                     <td>
                         <div class="input-group mb-3">
-                            <input type="text" class="form-control input-listen-changes" name="hue" placeholder="Hue" value="{{ link.hue }}">
-                            <input type="text" class="form-control input-listen-changes" name="saturation" placeholder="Saturation" value="{{ link.saturation }}">
-                            <input type="text" class="form-control input-listen-changes" name="brightness" placeholder="Brightness" value="{{ link.brightness }}">
+                            <input type="color" class="form-control form-control-color input-listen-changes" name="color" value="{{ link.hex_color }}" title="Choose the Color to Flash">
                         </div>
                     </td>
                     <td>
                         <div class="input-group mb-3">
-                            <input type="text" class="form-control input-listen-changes" name="number_flashes" placeholder="Number Flashes" value="{{ link.number_flashes }}">
+                            <input type="number" min="1" max="25" step="1" class="form-control input-listen-changes" name="number_flashes" placeholder="Number Flashes" value="{{ link.number_flashes }}">
                         </div>
                     </td>
                     <td>
@@ -47,25 +45,25 @@
         </tbody>
     </table>
 
-    <div class="input-group mb-3">
-        <select class="form-select" id="doorbellSelect">
-            <option value="" selected>Choose...</option>
-            {% for doorbell in data.doorbells %}
-                <option value="{{ doorbell.device_id }}">{{ doorbell.name }}</option>
-            {% endfor %}
-        </select>
-        <select class="form-select" id="lampiSelect">
-            <option value="" selected>Choose...</option>
-            {% for lampi in data.lampis %}
-                <option value="{{ lampi.device_id }}">{{ lampi.name }}</option>
-            {% endfor %}
-        </select>
-        <input type="text" class="form-control" name="hue" placeholder="Hue: 1.0" id="newHue" value="">
-        <input type="text" class="form-control" name="saturation" placeholder="Saturation: 1.0" id="newSaturation" value="">
-        <input type="text" class="form-control" name="brightness" placeholder="Brightness: 1.0" id="newBrightness" value="">
-        <input type="text" class="form-control" name="number_flashes" placeholder="Number of Flashes: 5" id="newNumberFlashes" value="">
-        <button class="btn btn-success" type="button" id="saveNewLink">Save</button>
-    </div>
+    <form action="" method="" id="addLinkForm">
+        <div class="input-group mb-3">
+            <select class="form-select" id="doorbellSelect">
+                <option value="" selected>Choose...</option>
+                {% for doorbell in data.doorbells %}
+                    <option value="{{ doorbell.device_id }}">{{ doorbell.name }}</option>
+                {% endfor %}
+            </select>
+            <select class="form-select" id="lampiSelect">
+                <option value="" selected>Choose...</option>
+                {% for lampi in data.lampis %}
+                    <option value="{{ lampi.device_id }}">{{ lampi.name }}</option>
+                {% endfor %}
+            </select>
+            <input type="color" class="form-control form-control-color input-listen-changes" id="newColor" name="color" value="#ff0000" title="Choose the Color to Flash">
+            <input type="text" class="form-control" name="number_flashes" placeholder="Number of Flashes: 5" id="newNumberFlashes" value="">
+            <button class="btn btn-success" type="button" id="saveNewLink">Save</button>
+        </div>
+    </form>
 </div>
 {% endblock %}
 
