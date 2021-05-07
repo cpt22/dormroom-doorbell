@@ -16,6 +16,7 @@
                 <th scope="col">Lampi</th>
                 <th scope="col">Color</th>
                 <th scope="col">Number Flashes</th>
+                <th scope="col"></th>
             </tr>
         </thead>
 
@@ -36,6 +37,11 @@
                             <input type="text" class="form-control input-listen-changes" name="number_flashes" placeholder="Number Flashes" value="{{ link.number_flashes }}">
                         </div>
                     </td>
+                    <td>
+                        <button class="btn btn-danger remove-link-button" type="button">
+                            <i class="bi bi-x"></i>
+                        </button>
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -43,13 +49,13 @@
 
     <div class="input-group mb-3">
         <select class="form-select" id="doorbellSelect">
-            <option selected>Choose...</option>
+            <option value="" selected>Choose...</option>
             {% for doorbell in data.doorbells %}
                 <option value="{{ doorbell.device_id }}">{{ doorbell.name }}</option>
             {% endfor %}
         </select>
         <select class="form-select" id="lampiSelect">
-            <option selected>Choose...</option>
+            <option value="" selected>Choose...</option>
             {% for lampi in data.lampis %}
                 <option value="{{ lampi.device_id }}">{{ lampi.name }}</option>
             {% endfor %}
