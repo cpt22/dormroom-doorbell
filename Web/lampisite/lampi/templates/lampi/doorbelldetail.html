@@ -1,27 +1,48 @@
 {% extends "lampi/base.html" %}
 
 {% block content %}
-<h3>{{ data.doorbell.name }}</h3>
-<br>
-<table class="table table-striped table-hover">
-    <thead>
-        <tr>
-            <th scope="col">Time</th>
-            <th scope="col">Transcription</th>
-            <th scope="col">File</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        {% for event in data.events %}
-            <tr class="clickable-row" data-href="{{ event.recording.url }}">
-                <td>{{ event.time }}</td>
-                <td>{{ event.transcription }}</td>
-                <td><a href="{{ event.recording.url }}">Download</a></td>
+<div class="col-8">
+    <div id="doorbell-name" class="row">
+        <div class="d-flex col-6">
+            <h3 class="me-4">{{ data.doorbell.name }}</h3>
+            <button id="edit-doorbell-name-button" type="button" class="btn btn-secondary me-auto">
+                <i class="bi bi-pencil"></i>
+            </button>
+        </div>
+    </div>
+    <form id="edit-doorbell-name-form" action="" method="post">
+        {% csrf_token %}
+        <div class="input-group">
+            <input type="text" name="name" class="form-control" placeholder="Name" value="{{ data.doorbell.name }}">
+            <button class="btn btn-success" type="submit">
+                <i class="bi bi-check2"></i>
+            </button>
+            <button id="cancel-edit-doorbell-name" class="btn btn-danger" type="button">
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+    </form>
+    <br>
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th scope="col">Time</th>
+                <th scope="col">Transcription</th>
+                <th scope="col">File</th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
+
+        <tbody>
+            {% for event in data.events %}
+                <tr class="clickable-row" data-href="{{ event.recording.url }}">
+                    <td>{{ event.time }}</td>
+                    <td>{{ event.transcription }}</td>
+                    <td><a href="{{ event.recording.url }}">Download</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
 
 {% block page_event %}LAMPI List{% endblock %}
