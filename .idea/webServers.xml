@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="58b241f8-8d26-47b8-9e1e-029096a3895d" name="lampi-final" url="http:///">
+        <fileTransfer accessType="SFTP" host="lampi" port="22" sshConfigId="46785d70-710b-40a3-808c-619080372544" sshConfig="pi@lampi:22 agent" authAgent="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="bb07cfae-af4c-499e-ad1b-e8eb633e5221" name="cloud-final" url="http:///">
+        <fileTransfer accessType="SFTP" host="iot_cloud" port="22" sshConfigId="cfffb083-eb1d-4ca4-9f65-e5fb42f6ebc0" sshConfig="ubuntu@iot_cloud:22 agent" authAgent="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="46bbe17c-b033-4ddd-9549-4b1a987ed994" name="doorbell1" url="http:///">
+        <fileTransfer accessType="SFTP" host="doorbell" port="22" sshConfigId="4f992f60-6992-4b71-9f80-a4668bbf7293" sshConfig="pi@doorbell:22 agent" authAgent="true" />
+      </webServer>
+    </option>
+  </component>
+</project>
