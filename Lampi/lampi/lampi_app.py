@@ -10,14 +10,24 @@ from paho.mqtt.client import Client
 import pigpio
 from lamp_common import *
 import lampi.lampi_util
+from kivy.core.window import Window
 
 
 MQTT_CLIENT_ID = "lamp_ui"
+BACKLIGHT_PIN = 18
+SCREEN_DIMMING_TIMEOUT = 10
 
 
 class NotificationPopup(Popup):
     title = StringProperty("No Message")
     message = StringProperty("")
+
+class AssociatedPopup(Popup):
+    title = StringProperty('Associate your Lamp')
+    message = StringProperty("")
+    Popup(title='Associate your Lamp',
+          content=Label(text='Msg here', font_size='30sp'),
+          size_hint=(1, 1), auto_dismiss=False)
 
 
 class LampiApp(App):
@@ -58,6 +68,10 @@ class LampiApp(App):
     notification_title = NotificationPopup()
     _notification_popup_scheduler = None
 
+    _backlight_dimming_timeout = None
+    _backlight_dimming_clock = None
+    _backlight_brightness = 255
+
     def on_start(self):
         self._publish_clock = None
         self.mqtt_broker_bridged = False
@@ -76,6 +90,7 @@ class LampiApp(App):
         self.associated_status_popup.bind(on_open=self.update_popup_associated)
         self.notification_popup = NotificationPopup()
         Clock.schedule_interval(self._poll_associated, 0.1)
+        self.detect_touch()
 
     def _build_associated_status_popup(self):
         return Popup(title='Associate your Lamp',
@@ -137,9 +152,12 @@ class LampiApp(App):
         new_associated = json.loads(message.payload.decode('utf-8'))
         if self._associated != new_associated['associated']:
             if not new_associated['associated']:
+                self._backlight_brightness = 255
+                self.write_backlight_brightness()
                 self.association_code = new_associated['code']
             else:
                 self.association_code = None
+                self.detect_touch()
             self._associated = new_associated['associated']
 
     def receive_notification(self, client, userdata, message):
@@ -156,6 +174,7 @@ class LampiApp(App):
             self.notification_popup.message = notification['message']
             self.notification_popup.open()
             self._notification_popup_scheduler = Clock.schedule_once(self.notification_popup.dismiss, 10.0)
+            self.detect_touch()
 
     def on_device_associated(self, instance, value):
         if value:
@@ -218,6 +237,7 @@ class LampiApp(App):
         self.pi.set_pull_up_down(17, pigpio.PUD_UP)
         self.pi.set_mode(22, pigpio.INPUT)
         self.pi.set_pull_up_down(22, pigpio.PUD_UP)
+        self.pi.set_mode(BACKLIGHT_PIN, pigpio.OUTPUT)
         Clock.schedule_interval(self._poll_GPIO, 0.05)
         self.network_status_popup = self._build_network_status_popup()
         self.network_status_popup.bind(on_open=self.update_popup_ip_address)
@@ -238,17 +258,39 @@ class LampiApp(App):
     def on_gpio17_pressed(self, instance, value):
         if value:
             self.network_status_popup.open()
+            self.detect_touch()
         else:
             self.network_status_popup.dismiss()
 
     def on_gpio22_pressed(self, instance, value):
-        if value:
+        if value and self.association_code is None:
             self.notification_popup.open()
+            self.detect_touch()
         else:
             pass
-            #self.notification_popup.dismiss()
 
     def _poll_GPIO(self, dt):
         # GPIO17 is the rightmost button when looking front of LAMPI
         self.gpio17_pressed = not self.pi.read(17)
         self.gpio22_pressed = not self.pi.read(22)
+
+    def write_backlight_brightness(self):
+        self.pi.set_PWM_dutycycle(BACKLIGHT_PIN, self._backlight_brightness)
+
+    def do_dimming(self):
+        if self._backlight_brightness > 5:
+            self._backlight_brightness -= 1
+            self.write_backlight_brightness()
+            self._backlight_dimming_clock = Clock.schedule_once(lambda dt: self.do_dimming(), 0.015)
+
+    def detect_touch(self):
+        if self._backlight_dimming_clock is not None:
+            self._backlight_dimming_clock.cancel()
+
+        self._backlight_brightness = 255
+        self.write_backlight_brightness()
+
+        if self._backlight_dimming_timeout is not None:
+            self._backlight_dimming_timeout.cancel()
+        self._backlight_dimming_timeout = Clock.schedule_once(lambda dt: self.do_dimming(), SCREEN_DIMMING_TIMEOUT)
+

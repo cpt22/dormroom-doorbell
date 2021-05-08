@@ -14,6 +14,7 @@
     title_size: '25sp'
     auto_dismiss: False
     BoxLayout:
+        on_touch_down: app.detect_touch()
         orientation: 'vertical'
         padding: 2
         BoxLayout:
@@ -36,6 +37,7 @@
 
 
 BoxLayout:
+    on_touch_down: app.detect_touch()
     canvas.before:
         Color:
             rgba: offwhite
