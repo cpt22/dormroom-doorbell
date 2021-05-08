@@ -3,6 +3,7 @@
   <component name="SshConfigs">
     <configs>
       <sshConfig authType="OPEN_SSH" host="lampi" id="46785d70-710b-40a3-808c-619080372544" port="22" nameFormat="DESCRIPTIVE" username="pi" />
+      <sshConfig authType="OPEN_SSH" host="iot_cloud" id="cfffb083-eb1d-4ca4-9f65-e5fb42f6ebc0" port="22" nameFormat="DESCRIPTIVE" username="ubuntu" />
     </configs>
   </component>
 </project>
