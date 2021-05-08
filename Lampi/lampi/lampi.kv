@@ -36,6 +36,20 @@
             on_release: root.dismiss()
 
 
+<AssociatedPopup>:
+    title: root.title
+    title_size: '20sp'
+    auto_dismiss: False
+    size_hint: 1, 1
+    BoxLayout:
+        on_touch_down: app.detect_touch()
+        orientation: 'vertical'
+        Label:
+            on_touch_down: app.detect_touch()
+            text: root.message
+            font_size: '30sp'
+
+
 BoxLayout:
     on_touch_down: app.detect_touch()
     canvas.before:

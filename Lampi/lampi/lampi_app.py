@@ -15,19 +15,17 @@ from kivy.core.window import Window
 
 MQTT_CLIENT_ID = "lamp_ui"
 BACKLIGHT_PIN = 18
-SCREEN_DIMMING_TIMEOUT = 10
+SCREEN_DIMMING_TIMEOUT = 60
 
 
 class NotificationPopup(Popup):
     title = StringProperty("No Message")
     message = StringProperty("")
 
+
 class AssociatedPopup(Popup):
     title = StringProperty('Associate your Lamp')
-    message = StringProperty("")
-    Popup(title='Associate your Lamp',
-          content=Label(text='Msg here', font_size='30sp'),
-          size_hint=(1, 1), auto_dismiss=False)
+    message = StringProperty("Missing Message")
 
 
 class LampiApp(App):
@@ -86,7 +84,7 @@ class LampiApp(App):
                           keepalive=MQTT_BROKER_KEEP_ALIVE_SECS)
         self.mqtt.loop_start()
         self.set_up_GPIO_and_network_status_popup()
-        self.associated_status_popup = self._build_associated_status_popup()
+        self.associated_status_popup = AssociatedPopup() #self._build_associated_status_popup()
         self.associated_status_popup.bind(on_open=self.update_popup_associated)
         self.notification_popup = NotificationPopup()
         Clock.schedule_interval(self._poll_associated, 0.1)
@@ -152,13 +150,11 @@ class LampiApp(App):
         new_associated = json.loads(message.payload.decode('utf-8'))
         if self._associated != new_associated['associated']:
             if not new_associated['associated']:
-                self._backlight_brightness = 255
-                self.write_backlight_brightness()
                 self.association_code = new_associated['code']
             else:
                 self.association_code = None
-                self.detect_touch()
             self._associated = new_associated['associated']
+            self.detect_touch()
 
     def receive_notification(self, client, userdata, message):
         notification = json.loads(message.payload.decode('utf-8'))
@@ -184,7 +180,7 @@ class LampiApp(App):
 
     def update_popup_associated(self, instance):
         code = self.association_code[0:6]
-        instance.content.text = ("Please use the\n"
+        self.associated_status_popup.message = ("Please use the\n"
                                  "following code\n"
                                  "to associate\n"
                                  "your device\n"
