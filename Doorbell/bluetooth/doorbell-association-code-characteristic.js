@@ -6,7 +6,7 @@ var CHARACTERISTIC_NAME = 'Association Code';
 var DoorbellAssociationCodeCharacteristic = function (doorbellState) {
     DoorbellAssociationCodeCharacteristic.super_.call(this, {
         uuid: '9771695f-2ca0-4144-af5d-90a86d82ab40',
-        properties: ['read', 'write', 'notify'],
+        properties: ['read', 'notify'],
         secure: [],
         descriptors: [
             new bleno.Descriptor({
@@ -26,8 +26,10 @@ var DoorbellAssociationCodeCharacteristic = function (doorbellState) {
         console.log('doorbellstate changed association code');
         if ( this._update !== null ) {
             console.log('this._update is ', typeof(this._update));
-            console.log('updating new onoff uuid=', this.uuid);
-            var data = new Buffer(code);
+            //var data = new Buffer("");
+            //if (doorbellState.assoc_state == false) {
+              var data = new Buffer(code);
+            //}
             this._update(data);
         }
     }
@@ -45,7 +47,10 @@ DoorbellAssociationCodeCharacteristic.prototype.onReadRequest = function(offset,
         console.log('onReadRequest offset');
         callback(this.RESULT_ATTR_NOT_LONG, null);
     } else {
-        let responseData = new Buffer(this.doorbellState.assoc_code);
+        //var responseData = new Buffer("");
+       // if (this.doorbellState.assoc_state == false) {
+          var responseData = new Buffer(this.doorbellState.assoc_code);
+        //}
         console.log("onReadRequest returning ", responseData);
         callback(this.RESULT_SUCCESS, responseData);
     }

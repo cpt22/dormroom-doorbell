@@ -34,9 +34,7 @@ class DeviceManager: NSObject, ObservableObject {
     
     private func anyDevicesFound() -> Bool {
         for key in devices.keys {
-            print(key)
             if (!devices[key]!.isEmpty) {
-                print("found device")
                 return true
             }
         }
@@ -98,7 +96,7 @@ extension DeviceManager: CBCentralManagerDelegate {
 
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         print("Manager Connected to peripheral \(peripheral)")
-        peripheral.discoverServices([Lampi.SERVICE_UUID])
+        peripheral.discoverServices([Lampi.SERVICE_UUID, Doorbell.WIFI_SERVICE_UUID, Doorbell.DOORBELL_SERVICE_UUID])
     }
 
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
