@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		19FA6CC626269673007B23AB /* Doorbell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19FA6CC526269673007B23AB /* Doorbell.swift */; };
+		19FAA2432648491700A73B67 /* Device.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19FAA2422648491700A73B67 /* Device.swift */; };
 		66EDC49726472E6C00810086 /* DoorbellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EDC49626472E6C00810086 /* DoorbellView.swift */; };
 		66EDC499264774BF00810086 /* LampiWifiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EDC498264774BF00810086 /* LampiWifiView.swift */; };
 		8516E57B256447D300E819F6 /* DeviceBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8516E57A256447D300E819F6 /* DeviceBrowserView.swift */; };
@@ -23,6 +24,7 @@
 
 /* Begin PBXFileReference section */
 		19FA6CC526269673007B23AB /* Doorbell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Doorbell.swift; sourceTree = "<group>"; };
+		19FAA2422648491700A73B67 /* Device.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Device.swift; sourceTree = "<group>"; };
 		66EDC49626472E6C00810086 /* DoorbellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoorbellView.swift; sourceTree = "<group>"; };
 		66EDC498264774BF00810086 /* LampiWifiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LampiWifiView.swift; sourceTree = "<group>"; };
 		8516E57A256447D300E819F6 /* DeviceBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBrowserView.swift; sourceTree = "<group>"; };
@@ -88,6 +90,7 @@
 				858B9BD82549D7A700A43AC3 /* Assets.xcassets */,
 				858B9BDD2549D7A700A43AC3 /* Info.plist */,
 				858B9BDA2549D7A700A43AC3 /* Preview Content */,
+				19FAA2422648491700A73B67 /* Device.swift */,
 			);
 			path = Lampi;
 			sourceTree = "<group>";
@@ -184,6 +187,7 @@
 				8516E57F2564514D00E819F6 /* DeviceManager.swift in Sources */,
 				858B9BD52549D7A400A43AC3 /* LampiApp.swift in Sources */,
 				8516E57B256447D300E819F6 /* DeviceBrowserView.swift in Sources */,
+				19FAA2432648491700A73B67 /* Device.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

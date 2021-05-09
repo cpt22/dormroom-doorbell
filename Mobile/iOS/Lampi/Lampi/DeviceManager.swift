@@ -9,11 +9,11 @@ import CoreBluetooth
 class DeviceManager: NSObject, ObservableObject {
     @Published var isScanning = true
 
-    var foundDevices: [Lampi] {
+    var foundDevices: [Device] {
         return Array(devices.values)
     }
 
-    private var devices = [String: Lampi]()
+    private var devices = [String: Device]()
 
     private var bluetoothManager: CBCentralManager!
 
@@ -27,8 +27,8 @@ extension DeviceManager: CBCentralManagerDelegate {
     func scanForDevices() {
         if bluetoothManager.state == .poweredOn {
             isScanning = true
-            print("Scanning for Lampis")
-            bluetoothManager.scanForPeripherals(withServices: [Lampi.SERVICE_UUID])
+            print("Scanning for Devices")
+            bluetoothManager.scanForPeripherals(withServices: [Lampi.SERVICE_UUID, Doorbell.DOORBELL_SERVICE_UUID])
             scheduleStopScan()
         }
     }
@@ -53,10 +53,15 @@ extension DeviceManager: CBCentralManagerDelegate {
 
         if let peripheralName = peripheral.name {
             print("Manager found device: \(peripheralName)")
-
-            let lampi = Lampi(lampiPeripheral: peripheral)
-            devices[peripheralName] = lampi
-
+            
+            if peripheralName.lowercased().contains("doorbell") {
+                let doorbell = Doorbell(devicePeripheral: peripheral)
+                devices[peripheralName] = doorbell
+            } else {//if peripheralName.lowercased().contains("lampi") {
+                let lampi = Lampi(devicePeripheral: peripheral)
+                devices[peripheralName] = lampi
+            }
+            
             bluetoothManager.connect(peripheral)
         }
     }
@@ -68,10 +73,10 @@ extension DeviceManager: CBCentralManagerDelegate {
 
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         if let peripheralName = peripheral.name,
-           let lampi = devices[peripheralName] {
+           let device = devices[peripheralName] {
             print("Manager Disconnected from peripheral \(peripheral)")
 
-            lampi.state.isConnected = false
+            device.isConnected = false
             bluetoothManager.connect(peripheral)
         }
     }

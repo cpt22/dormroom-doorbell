@@ -16,9 +16,9 @@ struct DoorbellView: View {
 
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
 
-    @State private var wifiName: String = ""
-    @State private var pass: String = ""
-    @State private var assoc: String = ""
+    //@State private var wifiName: String = ""
+    //@State private var pass: String = ""
+    //@State private var assoc: String = ""
 
     var body: some View {
         NavigationView{
@@ -31,7 +31,7 @@ struct DoorbellView: View {
                             .padding()
                         TextField(
                             "Wifi Name",
-                            text: $wifiName)
+                            text: $doorbell.state.ssid)
                             .disableAutocorrection(true)
                     }
                     HStack {
@@ -39,7 +39,7 @@ struct DoorbellView: View {
                             .padding()
                         SecureField(
                             "Password",
-                            text: $pass)
+                            text: $doorbell.state.psk)
                             .disableAutocorrection(true)
                     }
 
@@ -52,7 +52,7 @@ struct DoorbellView: View {
                     Text("Association Code")
                         .padding()
                     HStack {
-                        Text(assoc)
+                        Text(doorbell.state.associationCode)
 
                     }
                 }
@@ -64,8 +64,8 @@ struct DoorbellView: View {
     }
 }
 
-struct DoorbellView_Preview: PreviewProvider{
+/*struct DoorbellView_Preview: PreviewProvider{
     static var previews: some View{
         DoorbellView()
     }
-}
+}*/

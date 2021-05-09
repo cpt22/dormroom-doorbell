@@ -8,8 +8,7 @@ import CoreBluetooth
 import Combine
 import SwiftUI
 
-class Lampi: NSObject, ObservableObject {
-    let name: String
+class Lampi: Device {
     @Published var state = State() {
         didSet {
             if oldValue != state {
@@ -17,46 +16,20 @@ class Lampi: NSObject, ObservableObject {
             }
         }
     }
-
-    private func setupPeripheral() {
-        if let lampiPeripheral = lampiPeripheral  {
-            lampiPeripheral.delegate = self
-        }
-    }
-
+    
     private var bluetoothManager: CBCentralManager?
-
-    var lampiPeripheral: CBPeripheral? {
-        didSet {
-            setupPeripheral()
-        }
-    }
+    
     private var hsvCharacteristic: CBCharacteristic?
     private var brightnessCharacteristic: CBCharacteristic?
     private var onOffCharacteristic: CBCharacteristic?
 
-    // MARK: State Tracking
-    private var skipNextDeviceUpdate = false
-    private var pendingBluetoothUpdate = false
-
-    init(name: String) {
-        self.name = name
-        super.init()
-
+    override init(name: String) {
+        super.init(name: name)
         self.bluetoothManager = CBCentralManager(delegate: self, queue: nil)
     }
 
-    init(lampiPeripheral: CBPeripheral) {
-        guard let peripheralName = lampiPeripheral.name else {
-            fatalError("Lampi must initialized with a peripheral with a name")
-        }
-
-        self.lampiPeripheral = lampiPeripheral
-        self.name = peripheralName
-
-        super.init()
-
-        self.setupPeripheral() // properties set in init() do not trigger didSet
+    override init(devicePeripheral: CBPeripheral) {
+        super.init(devicePeripheral: devicePeripheral)
     }
 }
 
@@ -65,10 +38,6 @@ extension Lampi {
     static let HSV_UUID = CBUUID(string: "0002A7D3-D8A4-4FEA-8174-1736E808C066")
     static let BRIGHTNESS_UUID = CBUUID(string: "0003A7D3-D8A4-4FEA-8174-1736E808C066")
     static let ON_OFF_UUID = CBUUID(string: "0004A7D3-D8A4-4FEA-8174-1736E808C066")
-
-    private var shouldSkipUpdateDevice: Bool {
-        return skipNextDeviceUpdate || pendingBluetoothUpdate
-    }
 
     private func updateDevice(force: Bool = false) {
         if state.isConnected && (force || !shouldSkipUpdateDevice) {
@@ -88,7 +57,7 @@ extension Lampi {
     private func writeOnOff() {
         if let onOffCharacteristic = onOffCharacteristic {
             let data = Data(bytes: &state.isOn, count: 1)
-            lampiPeripheral?.writeValue(data, for: onOffCharacteristic, type: .withResponse)
+            devicePeripheral?.writeValue(data, for: onOffCharacteristic, type: .withResponse)
         }
     }
 
@@ -104,7 +73,7 @@ extension Lampi {
             hsv += valueInt << 16
 
             let data = Data(bytes: &hsv, count: 3)
-            lampiPeripheral?.writeValue(data, for: hsvCharacteristic, type: .withResponse)
+            devicePeripheral?.writeValue(data, for: hsvCharacteristic, type: .withResponse)
         }
     }
 
@@ -112,7 +81,7 @@ extension Lampi {
         if let brightnessCharacteristic = brightnessCharacteristic {
             var brightnessChar = UInt8(state.brightness * 255.0)
             let data = Data(bytes: &brightnessChar, count: 1)
-            lampiPeripheral?.writeValue(data, for: brightnessCharacteristic, type: .withResponse)
+            devicePeripheral?.writeValue(data, for: brightnessCharacteristic, type: .withResponse)
         }
     }
 }
@@ -146,7 +115,7 @@ extension Lampi: CBCentralManagerDelegate {
         if peripheral.name == name {
             print("Found \(name)")
 
-            lampiPeripheral = peripheral
+            devicePeripheral = peripheral
 
             bluetoothManager?.stopScan()
             bluetoothManager?.connect(peripheral)
@@ -166,8 +135,8 @@ extension Lampi: CBCentralManagerDelegate {
     }
 }
 
-extension Lampi: CBPeripheralDelegate {
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+extension Lampi {
+    override func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         guard let services = peripheral.services else { return }
 
         for service in services {
@@ -176,7 +145,7 @@ extension Lampi: CBPeripheralDelegate {
         }
     }
 
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         guard let characteristics = service.characteristics else { return }
 
         for characteristic in characteristics {

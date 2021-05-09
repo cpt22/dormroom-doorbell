@@ -13,11 +13,16 @@ struct DeviceBroswerView: View {
             BLEScannerView()
         } else {
             NavigationView {
-                List(deviceManager.foundDevices, id: \.name) { lampi in
-                    NavigationLink(destination: LampiView(lamp: lampi)) {
-                        LampiRow(device: lampi)
+                List(deviceManager.foundDevices, id: \.name) { device in
+                    if (device is Lampi) {
+                        NavigationLink(destination: LampiView(lamp: device)) {
+                            LampiRow(device: device)
+                        }
+                    } else if (device is Doorbell) {
+                        NavigationLink(destination: DoorbellView(doorbell: device)) {
+                            DoorbellRow(device: device)
+                        }
                     }
-                    
                 }
                 .navigationTitle("Nearby Devices")
                 .toolbar {
