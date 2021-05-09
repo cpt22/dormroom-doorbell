@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		19FA6CC626269673007B23AB /* Doorbell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19FA6CC526269673007B23AB /* Doorbell.swift */; };
+		66EDC49726472E6C00810086 /* DoorbellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EDC49626472E6C00810086 /* DoorbellView.swift */; };
+		66EDC499264774BF00810086 /* LampiWifiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66EDC498264774BF00810086 /* LampiWifiView.swift */; };
 		8516E57B256447D300E819F6 /* DeviceBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8516E57A256447D300E819F6 /* DeviceBrowserView.swift */; };
 		8516E57F2564514D00E819F6 /* DeviceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8516E57E2564514D00E819F6 /* DeviceManager.swift */; };
 		854D43B9255B2CD600565A15 /* GradientSlider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 854D43B8255B2CD600565A15 /* GradientSlider.swift */; };
@@ -21,6 +23,8 @@
 
 /* Begin PBXFileReference section */
 		19FA6CC526269673007B23AB /* Doorbell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Doorbell.swift; sourceTree = "<group>"; };
+		66EDC49626472E6C00810086 /* DoorbellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DoorbellView.swift; sourceTree = "<group>"; };
+		66EDC498264774BF00810086 /* LampiWifiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LampiWifiView.swift; sourceTree = "<group>"; };
 		8516E57A256447D300E819F6 /* DeviceBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceBrowserView.swift; sourceTree = "<group>"; };
 		8516E57E2564514D00E819F6 /* DeviceManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceManager.swift; sourceTree = "<group>"; };
 		854D43B8255B2CD600565A15 /* GradientSlider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientSlider.swift; sourceTree = "<group>"; };
@@ -49,8 +53,10 @@
 			isa = PBXGroup;
 			children = (
 				858B9BD62549D7A400A43AC3 /* LampiView.swift */,
+				66EDC49626472E6C00810086 /* DoorbellView.swift */,
 				8516E57A256447D300E819F6 /* DeviceBrowserView.swift */,
 				854D43B8255B2CD600565A15 /* GradientSlider.swift */,
+				66EDC498264774BF00810086 /* LampiWifiView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -170,8 +176,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				854D43B9255B2CD600565A15 /* GradientSlider.swift in Sources */,
+				66EDC499264774BF00810086 /* LampiWifiView.swift in Sources */,
 				858B9BD72549D7A400A43AC3 /* LampiView.swift in Sources */,
 				19FA6CC626269673007B23AB /* Doorbell.swift in Sources */,
+				66EDC49726472E6C00810086 /* DoorbellView.swift in Sources */,
 				858B9BE52549E2A000A43AC3 /* Lampi.swift in Sources */,
 				8516E57F2564514D00E819F6 /* DeviceManager.swift in Sources */,
 				858B9BD52549D7A400A43AC3 /* LampiApp.swift in Sources */,
@@ -305,7 +313,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Lampi/Preview Content\"";
-				DEVELOPMENT_TEAM = Z6G83N9S59;
+				DEVELOPMENT_TEAM = 9NDA238J6N;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Lampi/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -327,7 +335,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"Lampi/Preview Content\"";
-				DEVELOPMENT_TEAM = Z6G83N9S59;
+				DEVELOPMENT_TEAM = 9NDA238J6N;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = Lampi/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
