@@ -82,17 +82,12 @@ struct LampiView: View {
                         })
             
             
-            .navigationBarTitle("Doorbell Setup")
-            .navigationBarItems(trailing:
-                    HStack {
-                        Button(action: {
-                            print("SF Symbol button pressed...")
-                        }) {
-                            Image(systemName: "gear")
-                                .imageScale(.large)
-                        }
-                    }
-                )
+            .navigationBarTitle("Lampi Setup")
+            .navigationBarItems(leading:
+                                NavigationLink(destination: LampiWifiView()) {
+                                Image(systemName: "gear")
+                                        .imageScale(.large)
+                            })
         }
            
            
