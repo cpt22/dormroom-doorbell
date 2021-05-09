@@ -12,9 +12,14 @@ import Mixpanel
 
 
 struct DoorbellView: View {
-    @State private var wifiName: String = ""
-    @State private var pass: String = ""
-    
+    @ObservedObject var doorbell: Doorbell
+
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
+
+    //@State private var wifiName: String = ""
+    //@State private var pass: String = ""
+    //@State private var assoc: String = ""
+
     var body: some View {
         NavigationView{
             VStack {
@@ -26,7 +31,7 @@ struct DoorbellView: View {
                             .padding()
                         TextField(
                             "Wifi Name",
-                            text: $wifiName)
+                            text: $doorbell.state.ssid)
                             .disableAutocorrection(true)
                     }
                     HStack {
@@ -34,24 +39,24 @@ struct DoorbellView: View {
                             .padding()
                         SecureField(
                             "Password",
-                            text: $pass)
+                            text: $doorbell.state.psk)
                             .disableAutocorrection(true)
                     }
-                    
+
                     Button(action: {}, label: {
                         Text("Save")
                     }).padding()
-                    
+
                 }
                 VStack {
                     Text("Association Code")
                         .padding()
                     HStack {
-                        Text("#######")
-                        
+                        Text(doorbell.state.associationCode)
+
                     }
                 }
-                
+
                 Spacer()
             }
             .navigationBarTitle("Doorbell Setup")
@@ -59,8 +64,8 @@ struct DoorbellView: View {
     }
 }
 
-struct DoorbellView_Preview: PreviewProvider{
+/*struct DoorbellView_Preview: PreviewProvider{
     static var previews: some View{
         DoorbellView()
     }
-}
+}*/

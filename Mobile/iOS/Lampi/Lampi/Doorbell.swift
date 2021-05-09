@@ -10,8 +10,7 @@ import CoreBluetooth
 import Combine
 import SwiftUI
 
-class Doorbell: NSObject, ObservableObject {
-    let name: String
+class Doorbell: Device {
     @Published var state = State()
     
     private var ssidCharacteristic: CBCharacteristic?
@@ -21,42 +20,12 @@ class Doorbell: NSObject, ObservableObject {
     private var associationCodeCharacteristic: CBCharacteristic?
     private var associationStateCharacteristic: CBCharacteristic?
     
-    // MARK: State Tracking
-    private var skipNextDeviceUpdate = false
-    private var pendingBluetoothUpdate = false
-    
-    private func setupPeripheral() {
-        if let doorbellPeripheral = doorbellPeripheral {
-            doorbellPeripheral.delegate = self
-        }
+    override init(name: String) {
+        super.init(name: name)
     }
-    
-    var doorbellPeripheral: CBPeripheral? {
-        didSet {
-            setupPeripheral()
-        }
+    override init(devicePeripheral: CBPeripheral) {
+        super.init(devicePeripheral: devicePeripheral)
     }
-    
-    init(name: String) {
-        self.name = name
-        super.init()
-        
-        //self.bluetoothManager = CBCentralManager(delegate: self, queue: nil)
-    }
-    
-    init(doorbellPeripheral: CBPeripheral) {
-        guard let peripheralName = doorbellPeripheral.name else {
-            fatalError("Doorbell must be initialized with a peripheral with a name")
-        }
-        
-        self.doorbellPeripheral = doorbellPeripheral
-        self.name = peripheralName
-        
-        super.init()
-        
-        self.setupPeripheral()
-    }
-    
 }
 
 extension Doorbell {
@@ -69,12 +38,8 @@ extension Doorbell {
     static let PSK_UUID = CBUUID(string: "28c7042c-12da-49e8-845e-6086d18a81fa")
     static let WIFI_UPDATE_UUID = CBUUID(string: "38c7042c-12da-49e8-845e-6086d18a81fa")
     
-    private var shouldSkipUpdateDevice: Bool {
-        return skipNextDeviceUpdate || pendingBluetoothUpdate
-    }
-    
     private func sendWifiConfiguration(force: Bool = false) {
-        if state.isConnected && (force || !shouldSkipUpdateDevice) {
+        if isConnected && (force || !shouldSkipUpdateDevice) {
             pendingBluetoothUpdate = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
                 self?.writeSSID()
@@ -89,14 +54,14 @@ extension Doorbell {
     private func writeSSID() {
         if let ssidCharacteristic = ssidCharacteristic {
             let valueString = (state.ssid as NSString).data(using: String.Encoding.utf8.rawValue)
-            doorbellPeripheral?.writeValue(valueString!, for: ssidCharacteristic, type: .withResponse)
+            devicePeripheral?.writeValue(valueString!, for: ssidCharacteristic, type: .withResponse)
         }
     }
     
     private func writePSK() {
         if let pskCharacteristic = pskCharacteristic {
             let valueString = (state.psk as NSString).data(using: String.Encoding.utf8.rawValue)
-            doorbellPeripheral?.writeValue(valueString!, for: pskCharacteristic, type: .withResponse)
+            devicePeripheral?.writeValue(valueString!, for: pskCharacteristic, type: .withResponse)
         }
     }
     
@@ -104,14 +69,13 @@ extension Doorbell {
         if let wifiUpdateCharacteristic = wifiUpdateCharacteristic {
             var val: UInt8 = 1
             let data = Data(bytes: &val, count: 1)
-            doorbellPeripheral?.writeValue(data, for: wifiUpdateCharacteristic, type: .withResponse)
+            devicePeripheral?.writeValue(data, for: wifiUpdateCharacteristic, type: .withResponse)
         }
     }
 }
 
 extension Doorbell {
     struct State: Equatable {
-        var isConnected = false
         var ssid = ""
         var psk = ""
         
@@ -120,8 +84,8 @@ extension Doorbell {
     }
 }
 
-extension Doorbell: CBPeripheralDelegate {
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+extension Doorbell {
+    override func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         guard let services = peripheral.services else { return }
         
         for service in services {
@@ -130,7 +94,7 @@ extension Doorbell: CBPeripheralDelegate {
         }
     }
     
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         guard let characteristics = service.characteristics else { return }
         
         for characteristic in characteristics {
@@ -158,7 +122,7 @@ extension Doorbell: CBPeripheralDelegate {
         
         if self.ssidCharacteristic != nil && self.pskCharacteristic != nil && self.wifiUpdateCharacteristic != nil && self.associationCodeCharacteristic != nil && self.associationCodeCharacteristic != nil {
             //skipNextDeviceUpdate = true
-            state.isConnected = true
+            isConnected = true
         }
     }
     
