@@ -15,51 +15,51 @@ struct DoorbellView: View {
     @ObservedObject var doorbell: Doorbell
 
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
-    
+
     @State private var wifiName: String = ""
     @State private var pass: String = ""
     @State private var assoc: String = ""
-    
+
     var body: some View {
         NavigationView{
-        VStack {
+            VStack {
                 VStack {
                     Text("WIFI Setup")
-                                    .padding()
+                        .padding()
                     HStack {
                         Text("SSID:")
-                                        .padding()
+                            .padding()
                         TextField(
-                                   "Wifi Name",
-                                    text: $wifiName)
+                            "Wifi Name",
+                            text: $wifiName)
                             .disableAutocorrection(true)
                     }
                     HStack {
                         Text("Password:")
-                                        .padding()
+                            .padding()
                         SecureField(
-                                   "Password",
-                                    text: $pass)
-                                   .disableAutocorrection(true)
+                            "Password",
+                            text: $pass)
+                            .disableAutocorrection(true)
                     }
-                    
-                    Button(action: /*@START_MENU_TOKEN@*/{}/*@END_MENU_TOKEN@*/, label: {
+
+                    Button(action: {}, label: {
                         Text("Save")
                     }).padding()
 
                 }
                 VStack {
                     Text("Association Code")
-                                    .padding()
+                        .padding()
                     HStack {
                         Text(assoc)
-                       
+
                     }
                 }
-                
+
                 Spacer()
             }
-               .navigationBarTitle("Doorbell Setup")
+            .navigationBarTitle("Doorbell Setup")
         }
     }
 }
