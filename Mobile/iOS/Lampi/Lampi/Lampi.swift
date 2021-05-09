@@ -8,7 +8,7 @@ import CoreBluetooth
 import Combine
 import SwiftUI
 
-class Lampi: Device {
+class Lampi: Device, ObservableObject {
     @Published var state = State() {
         didSet {
             if oldValue != state {

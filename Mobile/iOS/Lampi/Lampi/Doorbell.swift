@@ -10,7 +10,7 @@ import CoreBluetooth
 import Combine
 import SwiftUI
 
-class Doorbell: Device {
+class Doorbell: Device, ObservableObject {
     @Published var state = State()
     
     private var ssidCharacteristic: CBCharacteristic?
@@ -34,11 +34,9 @@ extension Doorbell {
     static let ASSOC_STATE_UUID = CBUUID(string: "9772695f-2ca0-4144-af5d-90a86d82ab40")
     
     private func sendWifiConfiguration(force: Bool = false) {
-        print("hit method")
-        if isConnected {//&& (force || !shouldSkipUpdateDevice) {
+        if isConnected {
             pendingBluetoothUpdate = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
-                print("hit async")
                 self?.writeSSID()
                 self?.writePSK()
                 self?.writeUpdate()
@@ -49,11 +47,8 @@ extension Doorbell {
     }
     
     private func writeSSID() {
-        print("Trying ssid")
         if let ssidCharacteristic = ssidCharacteristic {
-            print("found ssid")
             let valueString = (state.ssid as NSString).data(using: String.Encoding.utf8.rawValue)
-            print(valueString)
             devicePeripheral?.writeValue(valueString!, for: ssidCharacteristic, type: .withResponse)
         }
     }
@@ -61,22 +56,19 @@ extension Doorbell {
     private func writePSK() {
         if let pskCharacteristic = pskCharacteristic {
             let valueString = (state.psk as NSString).data(using: String.Encoding.utf8.rawValue)
-            print(valueString)
             devicePeripheral?.writeValue(valueString!, for: pskCharacteristic, type: .withResponse)
         }
     }
     
     private func writeUpdate() {
         if let wifiUpdateCharacteristic = wifiUpdateCharacteristic {
-            var val: UInt8 = 1
+            var val: UInt8 = 5
             let data = Data(bytes: &val, count: 1)
-            print(data)
             devicePeripheral?.writeValue(data, for: wifiUpdateCharacteristic, type: .withResponse)
         }
     }
     
     public func sendWifiUpdate() {
-        print("Attempting")
         sendWifiConfiguration()
     }
 }
@@ -85,6 +77,7 @@ extension Doorbell {
     struct State: Equatable {
         var ssid = ""
         var psk = ""
+        var wifiResponse = ""
         
         var isAssociated = false
         var associationCode = ""
@@ -105,6 +98,7 @@ extension Doorbell {
         guard let characteristics = service.characteristics else { return }
         
         for characteristic in characteristics {
+            print(characteristic.uuid)
             switch characteristic.uuid {
             #warning("UNFINISHED")
                 case Doorbell.SSID_UUID:
@@ -115,6 +109,7 @@ extension Doorbell {
                     
                 case Doorbell.WIFI_UPDATE_UUID:
                     self.wifiUpdateCharacteristic = characteristic
+                    peripheral.setNotifyValue(true, for: characteristic)
                     
                 case Doorbell.ASSOC_STATE_UUID:
                     self.associationStateCharacteristic = characteristic
@@ -132,7 +127,6 @@ extension Doorbell {
         }
         
         if self.ssidCharacteristic != nil && self.pskCharacteristic != nil && self.wifiUpdateCharacteristic != nil && self.associationCodeCharacteristic != nil && self.associationCodeCharacteristic != nil {
-            //skipNextDeviceUpdate = true
             isConnected = true
         }
     }
@@ -143,6 +137,12 @@ extension Doorbell {
         
         switch characteristic.uuid {
             case Device.WIFI_UPDATE_UUID:
+                if (parseBoolean(for: updatedValue)) {
+                    state.wifiResponse = "WiFi Updated"
+                } else {
+                    state.wifiResponse = "Error in WiFi configuration!"
+                }
+                print(parseBoolean(for: updatedValue))
                 break
             case Doorbell.ASSOC_STATE_UUID:
                 state.isAssociated = parseBoolean(for: updatedValue)
@@ -151,10 +151,10 @@ extension Doorbell {
             default:
                 print("Unhandled Characteristic UUID: \(characteristic.uuid)")
         }
-        print("here")
     }
     
     private func parseBoolean(for value: Data) -> Bool {
+        print(value.first)
         return value.first == 1
     }
     

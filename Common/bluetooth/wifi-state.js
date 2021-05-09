@@ -33,12 +33,24 @@ function WifiState() {
         console.log("Connected to mqtt broker!")
         mqtt_client.publish(client_connection_topic,
             '1', {qos:2, retain:true})
-        //mqtt_client.subscribe(wifi_subscribe_topic);
+        mqtt_client.subscribe(that.wifi_subscribe_topic);
     });
 
-    //mqtt_client.on('message', function(topic, message) {
-    //    console.log("MQTT Message: ", topic, message);
-    //});
+    mqtt_client.on('message', function(topic, message) {
+        if (topic === that.wifi_subscribe_topic) {
+            let new_data = JSON.parse(message);
+            if (new_data['status'] == true) {
+                that.last_attempt = true;
+            } else {
+                that.last_attempt = false;
+            }
+
+            console.log(new_data);
+
+            that.emit('received-update-response', that.last_attempt);
+        }
+        console.log("MQTT Message: ", topic, message);
+    });
 
     this.mqtt_client = mqtt_client;
 }
@@ -67,6 +79,8 @@ WifiState.prototype.join_wifi = function() {
         return true;
     } else {
         console.log("Missing SSID");
+        this.mqtt_client.publish(this.wifi_subscribe_topic, JSON.stringify({'client': "",
+                  'status': false}), {qos:1});
         this.last_attempt = false;
         return false;
     }

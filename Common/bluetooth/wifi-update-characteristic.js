@@ -6,7 +6,7 @@ var CHARACTERISTIC_NAME = 'Update Credentials';
 var WifiUpdateCharacteristic = function(wifiState) {
     WifiUpdateCharacteristic.super_.call(this, {
         uuid: '38c7042c-12da-49e8-845e-6086d18a81fa',
-        properties: ['read', 'write', 'notify'],
+        properties: ['write', 'notify'],
         secure: [],
         descriptors: [
             new bleno.Descriptor({
@@ -23,11 +23,26 @@ var WifiUpdateCharacteristic = function(wifiState) {
     this._update = null;
     this.wifiState = wifiState;
 
+    this.received_update_response = function(status) {
+        console.log('received response');
+        if ( this._update !== null ) {
+            console.log('this._update is ', typeof(this._update));
+            var data = new Buffer(1);
+            if (status) {
+                data.writeUInt8(0x01, 0);
+            } else {
+                data.writeUInt8(0x00, 0);
+            }
+            this._update(data);
+        }
+    }
+
+    this.wifiState.on('received-update-response', this.received_update_response.bind(this))
 }
 
 util.inherits(WifiUpdateCharacteristic, bleno.Characteristic);
 
-WifiUpdateCharacteristic.prototype.onReadRequest = function(offset, callback) {
+/*WifiUpdateCharacteristic.prototype.onReadRequest = function(offset, callback) {
     console.log('onReadRequest');
     if (offset) {
         console.log('onReadRequest offset');
@@ -42,7 +57,7 @@ WifiUpdateCharacteristic.prototype.onReadRequest = function(offset, callback) {
         console.log("onReadRequest returning ", responseData);
         callback(this.RESULT_SUCCESS, responseData);
     }
-}
+}*/
 
 WifiUpdateCharacteristic.prototype.onWriteRequest = function(data, offset, withoutRespose, callback) {
     if (offset) {
@@ -54,7 +69,7 @@ WifiUpdateCharacteristic.prototype.onWriteRequest = function(data, offset, witho
         console.log(data.toString());
 
         let result = this.wifiState.join_wifi();
-        if ( this._update !== null ) {
+        /*if ( this._update !== null ) {
             var data = new Buffer(1);
             console.log("updating with result ", result);
             if (result) {
@@ -63,7 +78,7 @@ WifiUpdateCharacteristic.prototype.onWriteRequest = function(data, offset, witho
                 data.writeUInt8(0x00, 0);
             }
             this._update(data);
-        }
+        }*/
 
         callback(this.RESULT_SUCCESS);
     }

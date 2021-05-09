@@ -6,6 +6,7 @@ import json
 
 MQTT_CLIENT_ID = "wifi_config_service"
 
+
 class InvalidWifiConfig(Exception):
     pass
 
@@ -55,16 +56,18 @@ class WifiConfigService(object):
                 _psk = new_config['psk']
 
             if WifiConfigurator(_ssid, _psk).reconfigure():
+                print("updated wifi")
                 self.publish_config_change(True)
             else:
                 self.publish_config_change(False)
                 raise InvalidWifiConfig()
         except InvalidWifiConfig:
+            self.publish_config_change(False)
             print("Error applying new wifi settings " + str(msg.payload))
 
     def publish_config_change(self, status):
         config = {'client': self.lastClient,
-                   'status': status}
+                  'status': status}
         self._client.publish(TOPIC_WIFI_RESPONSE,
                              json.dumps(config).encode('utf-8'), qos=2)
 

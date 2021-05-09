@@ -8,9 +8,8 @@
 import Foundation
 import CoreBluetooth
 import Combine
-import SwiftUI
 
-class Device: NSObject, ObservableObject{
+class Device: NSObject {
     public let name: String
     public var isConnected = false
 

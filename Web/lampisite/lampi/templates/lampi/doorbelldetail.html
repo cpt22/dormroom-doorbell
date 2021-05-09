@@ -1,6 +1,7 @@
 {% extends "lampi/base.html" %}
 
 {% block content %}
+<span id="device-id" data-device-id="{{ data.doorbell.device_id }}"></span>
 <div class="col-8">
     <div id="device-name" class="row">
         <div class="d-flex col-6">
@@ -42,6 +43,9 @@
             {% endfor %}
         </tbody>
     </table>
+    <div id="dissociation">
+        <button id="dissociate-button" type="button" class="btn btn-danger">Dissociate</button>
+    </div>
 </div>
 {% endblock %}
 

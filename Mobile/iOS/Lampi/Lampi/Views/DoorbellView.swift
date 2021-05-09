@@ -38,9 +38,12 @@ struct DoorbellView: View {
                             text: $doorbell.state.psk)
                             .disableAutocorrection(true)
                     }
+                    Text(doorbell.state.wifiResponse)
+                        .padding()
 
                     Button(action: {
                         doorbell.sendWifiUpdate()
+                        UIApplication.shared.endEditing()
                     }, label: {
                         Text("Save")
                     }).padding()
@@ -71,3 +74,9 @@ struct DoorbellView: View {
         DoorbellView()
     }
 }*/
+
+extension UIApplication {
+    func endEditing() {
+        sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+    }
+}

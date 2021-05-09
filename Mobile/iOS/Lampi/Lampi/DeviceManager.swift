@@ -20,8 +20,6 @@ class DeviceManager: NSObject, ObservableObject {
     }
 
     private var devices = ["lampis": [String: Device](), "doorbells": [String: Device]()]//[String: [String: Device]]()
-    //private var lampiDevices = [String: Device]()
-    //private var doorbellDevices = [String: Device]()
     
     func findDevice(name: String) -> Device? {
         for key in devices.keys {

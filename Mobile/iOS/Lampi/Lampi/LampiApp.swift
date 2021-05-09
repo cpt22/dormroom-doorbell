@@ -22,11 +22,7 @@ struct LampiApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if USE_BROWSER {
-                DeviceBroswerView()
-            } else {
-                LampiView(lamp: Lampi(name: DEVICE_NAME))
-            }
+            DeviceBroswerView()
         }
     }
 }

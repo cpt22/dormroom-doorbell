@@ -102,17 +102,31 @@ private struct DoorbellRow: View {
     var body: some View {
         HStack {
             ZStack {
-                RoundedRectangle(cornerRadius: 3)
-                    .fill(Color.green)
-                    .shadow(radius: 2.0)
-                    .frame(width: 50, height: 50)
-                    .padding()
-
-                Image("doorbell")
-                    .resizable()
-                    .foregroundColor(.white)
-                    .frame(width: 40, height: 40)
-                    .shadow(radius: 2.0)
+                if (device.state.isAssociated) {
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color.green)
+                        .shadow(radius: 2.0)
+                        .frame(width: 50, height: 50)
+                        .padding()
+                    
+                    Image("doorbell")
+                        .resizable()
+                        .foregroundColor(.white)
+                        .frame(width: 40, height: 40)
+                        .shadow(radius: 2.0)
+                } else {
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color.red)
+                        .shadow(radius: 2.0)
+                        .frame(width: 50, height: 50)
+                        .padding()
+                    
+                    Image("doorbell")
+                        .resizable()
+                        .foregroundColor(.white)
+                        .frame(width: 40, height: 40)
+                        .shadow(radius: 2.0)
+                }
             }
 
             Text("\(device.name)")
