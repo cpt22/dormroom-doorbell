@@ -127,10 +127,10 @@ extension Doorbell {
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        
+        print("here")
     }
     
     private func parseString(for value: Data) -> String {
-        return ""
+        return "teststring"
     }
 }

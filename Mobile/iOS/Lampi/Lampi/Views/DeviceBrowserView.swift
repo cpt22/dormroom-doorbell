@@ -13,14 +13,33 @@ struct DeviceBroswerView: View {
             BLEScannerView()
         } else {
             NavigationView {
-                List(deviceManager.foundDevices, id: \.name) { device in
-                    if (device is Lampi) {
-                        NavigationLink(destination: LampiView(lamp: device)) {
-                            LampiRow(device: device)
+                /*List(deviceManager.foundDevices, id: \.name) { device in
+                    if (device is Doorbell) {
+                        NavigationLink(destination: DoorbellView(doorbell: device as! Doorbell)) {
+                            Row(device: device)
                         }
-                    } else if (device is Doorbell) {
-                        NavigationLink(destination: DoorbellView(doorbell: device)) {
-                            DoorbellRow(device: device)
+                    }
+                    /*if (device is Lampi) {
+                        NavigationLink(destination: LampiView(lampi: device as! Lampi)) {
+                            Row(device: device)
+                        }
+                    }*/
+                    
+                }*/
+                List {
+                    ForEach(Array(deviceManager.foundDevices.keys), id: \.self) { type in
+                        Section(header: Text(type)) {
+                            ForEach(deviceManager.foundDevices[type] ?? [], id: \.name) { device in
+                                if (device is Doorbell) {
+                                    NavigationLink(destination: DoorbellView(doorbell: device as! Doorbell)) {
+                                        DoorbellRow(device: device as! Doorbell)
+                                    }
+                                } else {
+                                    NavigationLink(destination: LampiView(lamp: device as! Lampi)) {
+                                        LampiRow(device: device as! Lampi)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -39,7 +58,7 @@ struct DeviceBroswerView: View {
     }
 }
 
-struct DeviceBrowserView_Previews: PreviewProvider {
+/*struct DeviceBrowserView_Previews: PreviewProvider {
     static var previews: some View {
         DeviceBroswerView()
 
@@ -49,7 +68,7 @@ struct DeviceBrowserView_Previews: PreviewProvider {
         DoorbellRow(device: Doorbell(name: "Test Doorbell"))
             .previewLayout(.sizeThatFits)
     }
-}
+}*/
 
 private struct LampiRow: View {
     @ObservedObject var device: Lampi
@@ -84,14 +103,15 @@ private struct DoorbellRow: View {
         HStack {
             ZStack {
                 RoundedRectangle(cornerRadius: 3)
+                    .fill(Color.green)
                     .shadow(radius: 2.0)
                     .frame(width: 50, height: 50)
                     .padding()
 
-                let imageName = "airport.extreme.tower"
-                Image(systemName: imageName)
-                    .imageScale(.large)
+                Image("doorbell")
+                    .resizable()
                     .foregroundColor(.white)
+                    .frame(width: 40, height: 40)
                     .shadow(radius: 2.0)
             }
 
