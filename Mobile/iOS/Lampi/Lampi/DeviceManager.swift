@@ -9,11 +9,39 @@ import CoreBluetooth
 class DeviceManager: NSObject, ObservableObject {
     @Published var isScanning = true
 
-    var foundDevices: [Device] {
-        return Array(devices.values)
+    var foundDevices: [String: [Device]] {
+        var dict = [String: [Device]]()
+        for key in devices.keys {
+            if (devices[key] != nil) {
+                dict[key] = Array(devices[key]!.values)
+            }
+        }
+        return dict
     }
 
-    private var devices = [String: Device]()
+    private var devices = ["lampis": [String: Device](), "doorbells": [String: Device]()]//[String: [String: Device]]()
+    //private var lampiDevices = [String: Device]()
+    //private var doorbellDevices = [String: Device]()
+    
+    func findDevice(name: String) -> Device? {
+        for key in devices.keys {
+            if (devices[key]![name] != nil) {
+                return devices[key]![name]
+            }
+        }
+        return nil
+    }
+    
+    private func anyDevicesFound() -> Bool {
+        for key in devices.keys {
+            print(key)
+            if (!devices[key]!.isEmpty) {
+                print("found device")
+                return true
+            }
+        }
+        return false
+    }
 
     private var bluetoothManager: CBCentralManager!
 
@@ -35,7 +63,7 @@ extension DeviceManager: CBCentralManagerDelegate {
 
     private func scheduleStopScan() {
         Timer.scheduledTimer(withTimeInterval: 5, repeats: false) { [weak self] _ in
-            if !(self?.devices.isEmpty ?? true) {
+            if (self?.anyDevicesFound() ?? false) {
                 self?.bluetoothManager.stopScan()
                 self?.isScanning = false
             } else {
@@ -56,10 +84,12 @@ extension DeviceManager: CBCentralManagerDelegate {
             
             if peripheralName.lowercased().contains("doorbell") {
                 let doorbell = Doorbell(devicePeripheral: peripheral)
-                devices[peripheralName] = doorbell
-            } else {//if peripheralName.lowercased().contains("lampi") {
+                devices["doorbells"]![peripheralName] = doorbell
+                //doorbellDevices[peripheralName] = doorbell
+            } else if peripheralName.lowercased().contains("lampi") {
                 let lampi = Lampi(devicePeripheral: peripheral)
-                devices[peripheralName] = lampi
+                devices["lampis"]![peripheralName] = lampi
+                //lampiDevices[peripheralName] = lampi
             }
             
             bluetoothManager.connect(peripheral)
@@ -72,12 +102,13 @@ extension DeviceManager: CBCentralManagerDelegate {
     }
 
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        if let peripheralName = peripheral.name,
-           let device = devices[peripheralName] {
-            print("Manager Disconnected from peripheral \(peripheral)")
+        if let peripheralName = peripheral.name {
+            if let device = findDevice(name: peripheralName) {
+                print("Manager Disconnected from peripheral \(peripheral)")
 
-            device.isConnected = false
-            bluetoothManager.connect(peripheral)
+                device.isConnected = false
+                bluetoothManager.connect(peripheral)
+           }
         }
     }
 }

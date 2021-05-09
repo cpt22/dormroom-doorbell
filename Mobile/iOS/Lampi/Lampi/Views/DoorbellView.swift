@@ -16,10 +16,6 @@ struct DoorbellView: View {
 
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
 
-    //@State private var wifiName: String = ""
-    //@State private var pass: String = ""
-    //@State private var assoc: String = ""
-
     var body: some View {
         NavigationView{
             VStack {
