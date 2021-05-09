@@ -80,7 +80,7 @@ struct LampiView: View {
                                 .shadow(radius: 2.0)
                         })
             .navigationBarTitle("Lampi Setup")
-            .navigationBarItems(leading:
+            .navigationBarItems(trailing:
                                 NavigationLink(destination: LampiWifiView()) {
                                 Image(systemName: "gear")
                                         .imageScale(.large)
