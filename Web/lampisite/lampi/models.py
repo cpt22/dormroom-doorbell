@@ -205,11 +205,10 @@ class DoorbellEvent(models.Model):
         try:
             doorbell = self.device_id
             lampis = doorbell.lampis.all()
-            if lampis:
-                for lampi in lampis:
+            links = LampiDoorbellLink.objects.filter(doorbell=doorbell)
+            if links:
+                for link in links:
                     try:
-                        link = LampiDoorbellLink.objects.get(doorbell=doorbell)
-
                         notification_message = {
                             'type': 'doorbell_event',
                             'title': doorbell.name,
@@ -220,7 +219,7 @@ class DoorbellEvent(models.Model):
                             'num_flashes': link.number_flashes,
                         }
                         paho.mqtt.publish.single(
-                            generate_lamp_notification_topic(lampi.device_id, 'lamp'),
+                            generate_lamp_notification_topic(link.lampi.device_id, 'lamp'),
                             json.dumps(notification_message),
                             qos=2,
                             retain=False,
@@ -231,5 +230,31 @@ class DoorbellEvent(models.Model):
                         print("missing lampi or something")
             else:
                 print("No associated lampis")
+            # if lampis:
+            #     for lampi in lampis:
+            #         try:
+            #             link = LampiDoorbellLink.objects.get(doorbell=doorbell, lampi=lampi)
+            #
+            #             notification_message = {
+            #                 'type': 'doorbell_event',
+            #                 'title': doorbell.name,
+            #                 'message': self.transcription,
+            #                 'hue': float(link.hue),
+            #                 'saturation': float(link.saturation),
+            #                 'brightness': float(link.brightness),
+            #                 'num_flashes': link.number_flashes,
+            #             }
+            #             paho.mqtt.publish.single(
+            #                 generate_lamp_notification_topic(lampi.device_id, 'lamp'),
+            #                 json.dumps(notification_message),
+            #                 qos=2,
+            #                 retain=False,
+            #                 hostname="localhost",
+            #                 port=50001,
+            #             )
+            #         except LampiDoorbellLink.DoesNotExist:
+            #             print("missing lampi or something")
+            # else:
+            #     print("No associated lampis")
         except Doorbell.DoesNotExist:
             print("Error finding doorbell")
