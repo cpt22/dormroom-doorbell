@@ -12,8 +12,13 @@ import Mixpanel
 
 
 struct DoorbellView: View {
+    @ObservedObject var doorbell: Doorbell
+
+    @Environment(\.presentationMode) var mode: Binding<PresentationMode>
+    
     @State private var wifiName: String = ""
     @State private var pass: String = ""
+    @State private var assoc: String = ""
     
     var body: some View {
         NavigationView{
@@ -47,7 +52,7 @@ struct DoorbellView: View {
                     Text("Association Code")
                                     .padding()
                     HStack {
-                        Text("#######")
+                        Text(assoc)
                        
                     }
                 }

@@ -46,6 +46,7 @@ struct LampiWifiView: View {
                 Spacer()
             }
                .navigationBarTitle("Lampi Setup")
+                
     }
 }
 

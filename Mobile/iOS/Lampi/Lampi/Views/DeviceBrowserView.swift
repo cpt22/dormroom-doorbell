@@ -15,8 +15,9 @@ struct DeviceBroswerView: View {
             NavigationView {
                 List(deviceManager.foundDevices, id: \.name) { lampi in
                     NavigationLink(destination: LampiView(lamp: lampi)) {
-                        DeviceRow(device: lampi)
+                        LampiRow(device: lampi)
                     }
+                    
                 }
                 .navigationTitle("Nearby Devices")
                 .toolbar {
@@ -37,12 +38,15 @@ struct DeviceBrowserView_Previews: PreviewProvider {
     static var previews: some View {
         DeviceBroswerView()
 
-        DeviceRow(device: Lampi(name: "Test Lampi"))
+        LampiRow(device: Lampi(name: "Test Lampi"))
+            .previewLayout(.sizeThatFits)
+        
+        DoorbellRow(device: Doorbell(name: "Test Doorbell"))
             .previewLayout(.sizeThatFits)
     }
 }
 
-private struct DeviceRow: View {
+private struct LampiRow: View {
     @ObservedObject var device: Lampi
 
     var body: some View {
@@ -55,6 +59,31 @@ private struct DeviceRow: View {
                     .padding()
 
                 let imageName = device.state.isOn ? "lightbulb" : "lightbulb.slash"
+                Image(systemName: imageName)
+                    .imageScale(.large)
+                    .foregroundColor(.white)
+                    .shadow(radius: 2.0)
+            }
+
+            Text("\(device.name)")
+
+            Spacer()
+        }
+    }
+}
+
+private struct DoorbellRow: View {
+    @ObservedObject var device: Doorbell
+
+    var body: some View {
+        HStack {
+            ZStack {
+                RoundedRectangle(cornerRadius: 3)
+                    .shadow(radius: 2.0)
+                    .frame(width: 50, height: 50)
+                    .padding()
+
+                let imageName = "airport.extreme.tower"
                 Image(systemName: imageName)
                     .imageScale(.large)
                     .foregroundColor(.white)
