@@ -17,7 +17,7 @@ struct DoorbellView: View {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
 
     var body: some View {
-        NavigationView{
+        NavigationView {
             VStack {
                 VStack {
                     Text("WIFI Setup")
@@ -39,23 +39,29 @@ struct DoorbellView: View {
                             .disableAutocorrection(true)
                     }
 
-                    Button(action: {}, label: {
+                    Button(action: {
+                        doorbell.sendWifiUpdate()
+                    }, label: {
                         Text("Save")
                     }).padding()
 
                 }
                 VStack {
-                    Text("Association Code")
-                        .padding()
-                    HStack {
-                        Text(doorbell.state.associationCode)
-
+                    if (doorbell.state.isAssociated) {
+                        Text("Doorbell is Associated")
+                            .padding()
+                    } else {
+                        Text("Web Association Code")
+                            .padding()
+                        HStack {
+                            Text(doorbell.state.associationCode.prefix(6))
+                        }
                     }
                 }
 
                 Spacer()
             }
-            .navigationBarTitle("Doorbell Setup")
+            .navigationBarTitle("Doorbell Setup", displayMode: .inline)
         }
     }
 }

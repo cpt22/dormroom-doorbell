@@ -33,15 +33,12 @@ extension Doorbell {
     static let ASSOC_CODE_UUID = CBUUID(string: "9771695f-2ca0-4144-af5d-90a86d82ab40")
     static let ASSOC_STATE_UUID = CBUUID(string: "9772695f-2ca0-4144-af5d-90a86d82ab40")
     
-    static let WIFI_SERVICE_UUID = CBUUID(string: "08c7042c-12da-49e8-845e-6086d18a81fa")
-    static let SSID_UUID = CBUUID(string: "18c7042c-12da-49e8-845e-6086d18a81fa")
-    static let PSK_UUID = CBUUID(string: "28c7042c-12da-49e8-845e-6086d18a81fa")
-    static let WIFI_UPDATE_UUID = CBUUID(string: "38c7042c-12da-49e8-845e-6086d18a81fa")
-    
     private func sendWifiConfiguration(force: Bool = false) {
-        if isConnected && (force || !shouldSkipUpdateDevice) {
+        print("hit method")
+        if isConnected {//&& (force || !shouldSkipUpdateDevice) {
             pendingBluetoothUpdate = true
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
+                print("hit async")
                 self?.writeSSID()
                 self?.writePSK()
                 self?.writeUpdate()
@@ -52,8 +49,11 @@ extension Doorbell {
     }
     
     private func writeSSID() {
+        print("Trying ssid")
         if let ssidCharacteristic = ssidCharacteristic {
+            print("found ssid")
             let valueString = (state.ssid as NSString).data(using: String.Encoding.utf8.rawValue)
+            print(valueString)
             devicePeripheral?.writeValue(valueString!, for: ssidCharacteristic, type: .withResponse)
         }
     }
@@ -61,6 +61,7 @@ extension Doorbell {
     private func writePSK() {
         if let pskCharacteristic = pskCharacteristic {
             let valueString = (state.psk as NSString).data(using: String.Encoding.utf8.rawValue)
+            print(valueString)
             devicePeripheral?.writeValue(valueString!, for: pskCharacteristic, type: .withResponse)
         }
     }
@@ -69,8 +70,14 @@ extension Doorbell {
         if let wifiUpdateCharacteristic = wifiUpdateCharacteristic {
             var val: UInt8 = 1
             let data = Data(bytes: &val, count: 1)
+            print(data)
             devicePeripheral?.writeValue(data, for: wifiUpdateCharacteristic, type: .withResponse)
         }
+    }
+    
+    public func sendWifiUpdate() {
+        print("Attempting")
+        sendWifiConfiguration()
     }
 }
 
@@ -102,19 +109,23 @@ extension Doorbell {
             #warning("UNFINISHED")
                 case Doorbell.SSID_UUID:
                     self.ssidCharacteristic = characteristic
-                    break
+                    
                 case Doorbell.PSK_UUID:
                     self.pskCharacteristic = characteristic
-                    break
+                    
                 case Doorbell.WIFI_UPDATE_UUID:
                     self.wifiUpdateCharacteristic = characteristic
-                    break
+                    
                 case Doorbell.ASSOC_STATE_UUID:
                     self.associationStateCharacteristic = characteristic
-                    break
+                    peripheral.readValue(for: characteristic)
+                    peripheral.setNotifyValue(true, for: characteristic)
+            
                 case Doorbell.ASSOC_CODE_UUID:
                     self.associationCodeCharacteristic = characteristic
-                    break
+                    peripheral.readValue(for: characteristic)
+                    peripheral.setNotifyValue(true, for: characteristic)
+                    
                 default:
                     continue
             }
@@ -127,10 +138,28 @@ extension Doorbell {
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        guard let updatedValue = characteristic.value,
+              !updatedValue.isEmpty else { return }
+        
+        switch characteristic.uuid {
+            case Device.WIFI_UPDATE_UUID:
+                break
+            case Doorbell.ASSOC_STATE_UUID:
+                state.isAssociated = parseBoolean(for: updatedValue)
+            case Doorbell.ASSOC_CODE_UUID:
+                state.associationCode = parseString(for: updatedValue)
+            default:
+                print("Unhandled Characteristic UUID: \(characteristic.uuid)")
+        }
         print("here")
     }
     
+    private func parseBoolean(for value: Data) -> Bool {
+        return value.first == 1
+    }
+    
     private func parseString(for value: Data) -> String {
-        return "teststring"
+        let str = String(decoding: value, as: UTF8.self)
+        return str
     }
 }

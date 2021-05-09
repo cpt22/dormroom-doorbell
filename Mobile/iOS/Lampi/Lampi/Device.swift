@@ -50,6 +50,11 @@ class Device: NSObject, ObservableObject{
 }
 
 extension Device {
+    static let WIFI_SERVICE_UUID = CBUUID(string: "08c7042c-12da-49e8-845e-6086d18a81fa")
+    static let SSID_UUID = CBUUID(string: "18c7042c-12da-49e8-845e-6086d18a81fa")
+    static let PSK_UUID = CBUUID(string: "28c7042c-12da-49e8-845e-6086d18a81fa")
+    static let WIFI_UPDATE_UUID = CBUUID(string: "38c7042c-12da-49e8-845e-6086d18a81fa")
+    
     public var shouldSkipUpdateDevice: Bool {
         return skipNextDeviceUpdate || pendingBluetoothUpdate
     }

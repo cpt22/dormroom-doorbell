@@ -71,7 +71,7 @@ struct LampiView: View {
                 
             }//vstack end
             .disabled(!lamp.state.isConnected)
-            .navigationBarBackButtonHidden(true)
+            .navigationBarBackButtonHidden(false)
                         .navigationBarItems(leading: Button(action : {
                             self.mode.wrappedValue.dismiss()
                         }){
