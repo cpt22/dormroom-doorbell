@@ -170,13 +170,21 @@ struct LampiView: View {
         }
         .disabled(!lamp.state.isConnected)
         .navigationBarBackButtonHidden(true)
-                    .navigationBarItems(leading: Button(action : {
-                        self.mode.wrappedValue.dismiss()
-                    }){
-                        Image(systemName: "arrow.left")
-                            .foregroundColor(.white)
-                            .shadow(radius: 2.0)
-                    })
+        .navigationBarItems(leading: Button(action : {
+            self.mode.wrappedValue.dismiss()
+        }){
+            Image(systemName: "arrow.left")
+                .foregroundColor(.white)
+                .shadow(radius: 2.0)
+        }, trailing:
+                                Button(action : {
+                                        self.mode.wrappedValue.dismiss()
+                                }) {
+                                    Image(systemName: "gear")
+                                        .foregroundColor(.white)
+                                        .shadow(radius: 2.0)
+                                })
+        
     }
 
     private func trackSliderEvent(_ sliderName: String, value: Double) {
