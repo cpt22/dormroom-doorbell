@@ -15,6 +15,9 @@ class Doorbell: NSObject, ObservableObject {
     // MARK: State Tracking
     private var skipNextDeviceUpdate = false
     private var pendingBluetoothUpdate = false
+    
+    
+    
 }
 
 extension Doorbell {

@@ -16,7 +16,6 @@ struct LampiWifiView: View {
     @State private var pass: String = ""
     
     var body: some View {
-        NavigationView{
         VStack {
                 VStack {
                     Text("WIFI Setup")
@@ -47,7 +46,6 @@ struct LampiWifiView: View {
                 Spacer()
             }
                .navigationBarTitle("Lampi Setup")
-        }
     }
 }
 

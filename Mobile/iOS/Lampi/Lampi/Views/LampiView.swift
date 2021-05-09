@@ -12,7 +12,6 @@ struct LampiView: View {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
 
     var body: some View {
-        NavigationView{
             VStack {
                 ZStack(alignment: .bottom) {
                     Rectangle()
@@ -80,15 +79,13 @@ struct LampiView: View {
                                 .foregroundColor(.white)
                                 .shadow(radius: 2.0)
                         })
-            
-            
             .navigationBarTitle("Lampi Setup")
             .navigationBarItems(leading:
                                 NavigationLink(destination: LampiWifiView()) {
                                 Image(systemName: "gear")
                                         .imageScale(.large)
                             })
-        }
+        
            
            
     }//bodyview ends here
