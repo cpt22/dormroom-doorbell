@@ -8,10 +8,6 @@ import Mixpanel
 
 @main
 struct LampiApp: App {
-    #warning("Update DEVICE_NAME")
-    let DEVICE_NAME = "LAMPI XXXXXXX"
-    let USE_BROWSER = true
-
     #warning("Update MIXPANEL_TOKEN")
     let MIXPANEL_TOKEN = "INSERT MIXPANEL TOKEN HERE"
 

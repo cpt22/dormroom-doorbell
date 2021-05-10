@@ -17,10 +17,6 @@ class Doorbell: Device {
         }
     }
     
-    /*private var ssidCharacteristic: CBCharacteristic?
-    private var pskCharacteristic: CBCharacteristic?
-    private var wifiUpdateCharacteristic: CBCharacteristic?*/
-    
     private var associationCodeCharacteristic: CBCharacteristic?
     private var associationStateCharacteristic: CBCharacteristic?
     
@@ -44,10 +40,6 @@ extension Doorbell {
 
 extension Doorbell {
     struct State: Equatable {
-        //var ssid = ""
-        //var psk = ""
-        //var wifiResponse = ""
-        
         var isAssociated = false
         var associationCode = ""
     }
@@ -71,16 +63,6 @@ extension Doorbell {
         
         for characteristic in characteristics {
             switch characteristic.uuid {
-                /*case Doorbell.SSID_UUID:
-                    self.ssidCharacteristic = characteristic
-                    
-                case Doorbell.PSK_UUID:
-                    self.pskCharacteristic = characteristic
-                    
-                case Doorbell.WIFI_UPDATE_UUID:
-                    self.wifiUpdateCharacteristic = characteristic
-                    peripheral.setNotifyValue(true, for: characteristic)*/
-                    
                 case Doorbell.ASSOC_STATE_UUID:
                     self.associationStateCharacteristic = characteristic
                     peripheral.readValue(for: characteristic)
@@ -104,13 +86,6 @@ extension Doorbell {
               !updatedValue.isEmpty else { return }
         
         switch characteristic.uuid {
-            /*case Device.WIFI_UPDATE_UUID:
-                if (parseBoolean(for: updatedValue)) {
-                    state.wifiResponse = "WiFi Updated"
-                } else {
-                    state.wifiResponse = "Error in WiFi configuration!"
-                }
-                break*/
             case Doorbell.ASSOC_STATE_UUID:
                 state.isAssociated = parseBoolean(for: updatedValue)
                 

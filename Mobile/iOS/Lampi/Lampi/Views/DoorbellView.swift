@@ -22,16 +22,29 @@ struct DoorbellView: View {
                 Text("Doorbell is Associated")
                     .padding()
             } else {
-                Text("Web Association Code")
-                    .padding()
-                HStack {
+                VStack {
+                    Text("Web Association Code")
+                        .padding([.leading, .trailing, .top, .bottom])
+                        .font(
+                            .system(size: 22.0, weight: .bold)
+                        )
+        
                     Text(doorbell.state.associationCode.prefix(6))
+                        .font(
+                            .system(size: 30.0)
+                        )
                 }
             }
             
-            Text("WiFi Setup")
-                .padding()
-            WifiSettingsView(device: doorbell)
+            VStack {
+                Text("WiFi Setup")
+                    .padding()
+                    .font(
+                        .system(size: 22.0, weight: .bold)
+                    )
+                WifiSettingsView(device: doorbell)
+            }
+            .padding()
         }
         Spacer()
             .navigationBarBackButtonHidden(true)
@@ -48,8 +61,8 @@ struct DoorbellView: View {
     
 }
 
-/*struct DoorbellView_Preview: PreviewProvider{
- static var previews: some View{
- DoorbellView()
+struct DoorbellView_Preview: PreviewProvider{
+    static var previews: some View{
+        DoorbellView(doorbell: Doorbell(name: "Poop"))
+    }
  }
- }*/

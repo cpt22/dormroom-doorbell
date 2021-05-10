@@ -19,15 +19,6 @@ class Lampi: Device {
             self.objectWillChange.send()
         }
     }
-    /*@Published var state = State() {
-        didSet {
-            if oldValue != state {
-                updateDevice()
-            }
-        }
-    }*/
-    
-    private var bluetoothManager: CBCentralManager?
     
     private var hsvCharacteristic: CBCharacteristic?
     private var brightnessCharacteristic: CBCharacteristic?
@@ -35,11 +26,14 @@ class Lampi: Device {
 
     override init(name: String) {
         super.init(name: name)
-        self.bluetoothManager = CBCentralManager(delegate: self, queue: nil)
     }
 
     override init(devicePeripheral: CBPeripheral) {
         super.init(devicePeripheral: devicePeripheral)
+    }
+    
+    override func isConnected() -> Bool {
+        return super.isConnected() && hsvCharacteristic != nil && brightnessCharacteristic != nil && onOffCharacteristic != nil
     }
 }
 
@@ -111,37 +105,6 @@ extension Lampi {
         var baseHueColor: Color {
             Color(hue: hue, saturation: 1.0, brightness: 1.0)
         }
-    }
-}
-
-extension Lampi: CBCentralManagerDelegate {
-    func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        if central.state == .poweredOn {
-            bluetoothManager?.scanForPeripherals(withServices: [Lampi.SERVICE_UUID])
-        }
-    }
-
-    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
-        if peripheral.name == name {
-            print("Found \(name)")
-
-            devicePeripheral = peripheral
-
-            bluetoothManager?.stopScan()
-            bluetoothManager?.connect(peripheral)
-        }
-    }
-
-    func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        print("Connected to peripheral \(peripheral)")
-        peripheral.delegate = self
-        peripheral.discoverServices([Lampi.SERVICE_UUID])
-    }
-
-    func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
-        print("Disconnected from peripheral \(peripheral)")
-        state.isConnected = false
-        bluetoothManager?.connect(peripheral)
     }
 }
 
