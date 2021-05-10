@@ -8,14 +8,24 @@ import CoreBluetooth
 import Combine
 import SwiftUI
 
-class Lampi: Device, ObservableObject {
-    @Published var state = State() {
+class Lampi: Device {
+    var state = State() {
         didSet {
             if oldValue != state {
                 updateDevice()
             }
         }
+        willSet {
+            self.objectWillChange.send()
+        }
     }
+    /*@Published var state = State() {
+        didSet {
+            if oldValue != state {
+                updateDevice()
+            }
+        }
+    }*/
     
     private var bluetoothManager: CBCentralManager?
     
@@ -137,6 +147,8 @@ extension Lampi: CBCentralManagerDelegate {
 
 extension Lampi {
     override func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+        super.peripheral(peripheral, didDiscoverServices: error)
+        
         guard let services = peripheral.services else { return }
 
         for service in services {
@@ -146,6 +158,8 @@ extension Lampi {
     }
 
     override func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+        super.peripheral(peripheral, didDiscoverCharacteristicsFor: service, error: error)
+        
         guard let characteristics = service.characteristics else { return }
 
         for characteristic in characteristics {
@@ -177,7 +191,9 @@ extension Lampi {
         }
     }
 
-    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+    override func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        super.peripheral(peripheral, didUpdateValueFor: characteristic, error: error)
+        
         skipNextDeviceUpdate = true
 
         guard let updatedValue = characteristic.value,

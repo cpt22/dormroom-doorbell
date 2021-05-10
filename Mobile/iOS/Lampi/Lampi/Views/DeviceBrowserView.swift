@@ -13,19 +13,6 @@ struct DeviceBroswerView: View {
             BLEScannerView()
         } else {
             NavigationView {
-                /*List(deviceManager.foundDevices, id: \.name) { device in
-                    if (device is Doorbell) {
-                        NavigationLink(destination: DoorbellView(doorbell: device as! Doorbell)) {
-                            Row(device: device)
-                        }
-                    }
-                    /*if (device is Lampi) {
-                        NavigationLink(destination: LampiView(lampi: device as! Lampi)) {
-                            Row(device: device)
-                        }
-                    }*/
-                    
-                }*/
                 List {
                     ForEach(Array(deviceManager.foundDevices.keys), id: \.self) { type in
                         Section(header: Text(type)) {

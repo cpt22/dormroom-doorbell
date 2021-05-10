@@ -13,70 +13,43 @@ import Mixpanel
 
 struct DoorbellView: View {
     @ObservedObject var doorbell: Doorbell
-
+    
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
-
+    
     var body: some View {
-        NavigationView {
-            VStack {
-                VStack {
-                    Text("WIFI Setup")
-                        .padding()
-                    HStack {
-                        Text("SSID:")
-                            .padding()
-                        TextField(
-                            "Wifi Name",
-                            text: $doorbell.state.ssid)
-                            .disableAutocorrection(true)
-                    }
-                    HStack {
-                        Text("Password:")
-                            .padding()
-                        SecureField(
-                            "Password",
-                            text: $doorbell.state.psk)
-                            .disableAutocorrection(true)
-                    }
-                    Text(doorbell.state.wifiResponse)
-                        .padding()
-
-                    Button(action: {
-                        doorbell.sendWifiUpdate()
-                        UIApplication.shared.endEditing()
-                    }, label: {
-                        Text("Save")
-                    }).padding()
-
+        VStack {
+            if (doorbell.state.isAssociated) {
+                Text("Doorbell is Associated")
+                    .padding()
+            } else {
+                Text("Web Association Code")
+                    .padding()
+                HStack {
+                    Text(doorbell.state.associationCode.prefix(6))
                 }
-                VStack {
-                    if (doorbell.state.isAssociated) {
-                        Text("Doorbell is Associated")
-                            .padding()
-                    } else {
-                        Text("Web Association Code")
-                            .padding()
-                        HStack {
-                            Text(doorbell.state.associationCode.prefix(6))
-                        }
-                    }
-                }
-
-                Spacer()
             }
-            .navigationBarTitle("Doorbell Setup", displayMode: .inline)
+            
+            Text("WiFi Setup")
+                .padding()
+            WifiSettingsView(device: doorbell)
         }
+        Spacer()
+            .navigationBarBackButtonHidden(true)
+            .navigationBarItems(leading: Button(action : {
+                self.mode.wrappedValue.dismiss()
+            }){
+                Image(systemName: "arrow.left")
+                    .foregroundColor(.blue)
+                    .shadow(radius: 2.0)
+            })
+            .navigationBarTitle("Doorbell Setup", displayMode: .inline)
     }
+    
+    
 }
 
 /*struct DoorbellView_Preview: PreviewProvider{
-    static var previews: some View{
-        DoorbellView()
-    }
-}*/
-
-extension UIApplication {
-    func endEditing() {
-        sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-    }
-}
+ static var previews: some View{
+ DoorbellView()
+ }
+ }*/

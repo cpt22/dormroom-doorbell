@@ -81,11 +81,9 @@ extension DeviceManager: CBCentralManagerDelegate {
             if peripheralName.lowercased().contains("doorbell") {
                 let doorbell = Doorbell(devicePeripheral: peripheral)
                 devices["doorbells"]![peripheralName] = doorbell
-                //doorbellDevices[peripheralName] = doorbell
             } else if peripheralName.lowercased().contains("lampi") {
                 let lampi = Lampi(devicePeripheral: peripheral)
                 devices["lampis"]![peripheralName] = lampi
-                //lampiDevices[peripheralName] = lampi
             }
             
             bluetoothManager.connect(peripheral)
@@ -102,7 +100,7 @@ extension DeviceManager: CBCentralManagerDelegate {
             if let device = findDevice(name: peripheralName) {
                 print("Manager Disconnected from peripheral \(peripheral)")
 
-                device.isConnected = false
+                device.managerConnected = false
                 bluetoothManager.connect(peripheral)
            }
         }
