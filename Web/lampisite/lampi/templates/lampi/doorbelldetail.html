@@ -1,5 +1,7 @@
 {% extends "lampi/base.html" %}
 
+{% block title %}Doorbell{% endblock %}
+
 {% block content %}
 <span id="device-id" data-device-id="{{ data.doorbell.device_id }}"></span>
 <div class="col-8">
@@ -49,4 +51,4 @@
 </div>
 {% endblock %}
 
-{% block page_event %}LAMPI List{% endblock %}
+{% block page_event %}Doorbell Detail{% endblock %}

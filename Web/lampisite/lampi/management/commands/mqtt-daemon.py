@@ -63,7 +63,7 @@ class Command(BaseCommand):
                     device = Doorbell.objects.get(device_id=device_id)
                     print("Found Doorbell {}".format(device))
                 except Doorbell.DoesNotExist:
-                    #this is a new device - create a new record for it
+                    # this is a new device - create a new record for it
                     new_device = Doorbell(device_id=device_id)
                     uname = settings.DEFAULT_USER
                     new_device.user = User.objects.get(username=uname)

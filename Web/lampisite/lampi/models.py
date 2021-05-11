@@ -71,6 +71,8 @@ class Lampi(models.Model):
 
     type = "lamp"
 
+    mp = Mixpanel(settings.MIXPANEL_TOKEN)
+
     def __str__(self):
         return "{}: {}".format(self.device_id, self.name)
 
@@ -81,8 +83,6 @@ class Lampi(models.Model):
         }
         return dct
 
-    # def _generate_device_association_topic(self):
-    #    return 'devices/{}/lamp/associated'.format(self.device_id)
     def dissociate(self):
         self.user = get_parked_user()
         self.association_code = generate_association_code()
@@ -106,6 +106,9 @@ class Lampi(models.Model):
         assoc_msg = {}
         assoc_msg['associated'] = True
         send_association_message(self.type, self.device_id, assoc_msg)
+        self.mp.track(self.user.username, "LAMPI Association",
+                      {'event_type': 'association', 'device_id': self.device_id,
+                       'associated': True})
 
 
 class Doorbell(models.Model):
@@ -119,6 +122,8 @@ class Doorbell(models.Model):
     lampis = models.ManyToManyField('Lampi', through='LampiDoorbellLink', related_name='doorbells')
 
     type = "doorbell"
+
+    mp = Mixpanel(settings.MIXPANEL_TOKEN)
 
     def __str__(self):
         return "{}: {}".format(self.device_id, self.name)
@@ -135,6 +140,7 @@ class Doorbell(models.Model):
         self.association_code = generate_association_code()
         self.save()
         self.publish_unassociated_msg()
+        self.events.all().delete()
 
     def publish_unassociated_msg(self):
         # send association MQTT message
@@ -151,6 +157,9 @@ class Doorbell(models.Model):
         assoc_msg = {}
         assoc_msg['associated'] = True
         send_association_message(self.type, self.device_id, assoc_msg)
+        self.mp.track(self.user.username, "Doorbell Association",
+                      {'event_type': 'association', 'device_id': self.device_id,
+                       'associated': True})
 
 
 class LampiDoorbellLink(models.Model):
@@ -200,7 +209,7 @@ class LampiDoorbellLink(models.Model):
 
 
 class DoorbellEvent(models.Model):
-    device_id = models.ForeignKey('Doorbell', related_name='doorbell', on_delete=models.CASCADE)
+    doorbell = models.ForeignKey(Doorbell, related_name='events', on_delete=models.CASCADE)
     time = models.DateTimeField(default=timezone.now)
     recording = models.FileField(blank=False, null=False)
     transcription = models.TextField()
@@ -223,10 +232,10 @@ class DoorbellEvent(models.Model):
         self.save()
         self.send_notification_to_associated_lampis()
 
-        user = self.device_id.user
+        user = self.doorbell.user
         if user is not get_parked_user() and user.profile.phone:
             print(settings.TWILIO_AUTH_TOKEN)
-            twiliotext = self.device_id.name + ": " + self.transcription
+            twiliotext = self.doorbell.name + ": " + self.transcription
             print("Running twilio messenger")
             client = TwilioClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
             print("Sending message to: " + user.profile.phone)
@@ -240,12 +249,12 @@ class DoorbellEvent(models.Model):
 
     def send_notification_to_associated_lampis(self):
         try:
-            doorbell = self.device_id
+            doorbell = self.doorbell
             links = LampiDoorbellLink.objects.filter(doorbell=doorbell)
 
             Mixpanel(settings.MIXPANEL_TOKEN).track('mqttbridge', "Doorbell Event",
-                     {'event_type': 'doorbellevent', 'device_id': doorbell.device_id,
-                      'time': self.time, 'number_devices_notified': links.count()})
+                                                    {'event_type': 'doorbellevent', 'device_id': doorbell.doorbell,
+                                                     'time': self.time, 'number_devices_notified': links.count()})
             if links:
                 for link in links:
                     try:
@@ -259,7 +268,7 @@ class DoorbellEvent(models.Model):
                             'num_flashes': link.number_flashes,
                         }
                         paho.mqtt.publish.single(
-                            generate_lamp_notification_topic(link.lampi.device_id, 'lamp'),
+                            generate_lamp_notification_topic(link.lampi.doorbell, 'lamp'),
                             json.dumps(notification_message),
                             qos=2,
                             retain=False,

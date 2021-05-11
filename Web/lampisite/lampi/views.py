@@ -74,7 +74,7 @@ class DoorbellDetailView(LoginRequiredMixin, FormMixin, generic.ListView):
     def get_queryset(self):
         doorbell = get_object_or_404(Doorbell, pk=self.kwargs['device_id'], user=self.request.user)
         results = {'doorbell': doorbell,
-                   'events': DoorbellEvent.objects.filter(device_id=doorbell.device_id)
+                   'events': DoorbellEvent.objects.filter(doorbell=doorbell)
                        .order_by('-time')}
         return results
 
