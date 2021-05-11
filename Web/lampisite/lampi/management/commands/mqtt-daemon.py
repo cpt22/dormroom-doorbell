@@ -1,5 +1,5 @@
 import re
-from paho.mqtt.client import Client
+from paho.mqtt.client import Client as MQTTClient
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -45,7 +45,7 @@ class Command(BaseCommand):
         self.client.subscribe('devices/+/lamp/changed')
 
     def _create_mqtt_client_and_loop_forever(self):
-        self.client = Client()
+        self.client = MQTTClient()
         self.client.on_connect = self._on_connect
         self.client.connect('localhost', port=50001)
         self.client.loop_forever()

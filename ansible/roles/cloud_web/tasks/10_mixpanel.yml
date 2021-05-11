@@ -1,21 +1,25 @@
 - name: install build-essential
+  tags: [mixpanel]
   become: True
   apt:
     name: build-essential
     cache_valid_time: "{{ cache_update_valid_secs }}"
 
 - name: install Mixpanel credentials into mixpanel_settings.py
+  tags: [mixpanel]
   template:
     src: 10_mixpanel_settings.py
     dest: "{{ django_dir }}/lampisite/mixpanel_settings.py"
-    force: no
+    force: yes
 
 - name: install Mixpanel library
+  tags: [mixpanel]
   become: True
   pip:
     name: mixpanel
 
 - name: restart uwsgi
+  tags: [mixpanel]
   become: True
   supervisorctl:
     name: uwsgi

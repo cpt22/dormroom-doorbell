@@ -146,3 +146,10 @@ try:
     from .mixpanel_settings import MIXPANEL_TOKEN
 except (ModuleNotFoundError, ImportError) as e:
     MIXPANEL_TOKEN = "UPDATE TOKEN IN mixpanel_settings.py"
+
+try:
+    from .twilio_settings import TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN
+except (ModuleNotFoundError, ImportError) as e:
+    print("Error")
+    TWILIO_ACCOUNT_SID = "UPDATE ACCOUNT SID"
+    TWILIO_AUTH_TOKEN = "UPDATE TWILIO AUTH TOKEN"

@@ -2,16 +2,15 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.conf import settings
 from uuid import uuid4
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from twilio.rest import Client
+from twilio.rest import Client as TwilioClient
 import speech_recognition as sr
 import json
 import paho.mqtt.publish
 import colorsys
-import threading
-from .keys import *
 
 # Create your models here.
 DEFAULT_USER = 'parked_device_user'
@@ -226,19 +225,18 @@ class DoorbellEvent(models.Model):
 
         user = self.device_id.user
         if user is not get_parked_user() and user.profile.phone:
+            print(settings.TWILIO_AUTH_TOKEN)
             twiliotext = self.device_id.name + ": " + self.transcription
             print("Running twilio messenger")
-            client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+            client = TwilioClient(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
             print("Sending message to: " + user.profile.phone)
             message = client.messages.create(
                 to=user.profile.phone,
                 from_="+16175534108",
-                body=twiliotext
+               body=twiliotext
             )
             print(message.sid)
             print(message)
-            #tm = TwilioMessenger(user.profile.phone, twiliotext)
-            #tm.start()
 
     def send_notification_to_associated_lampis(self):
         try:
@@ -271,23 +269,3 @@ class DoorbellEvent(models.Model):
                 print("No associated lampis")
         except Doorbell.DoesNotExist:
             print("Error finding doorbell")
-
-
-class TwilioMessenger(threading.Thread):
-    def __init__(self, destination, text):
-        threading.Thread.__init__(self)
-        self.destination = destination
-        self.text = text
-
-    def run(self):
-        print("Running twilio messenger")
-        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-        print("Sending message to: " + self.destination)
-        message = client.messages.create(
-            to=self.destination,
-            from_="+16175534108",
-            body=self.text
-        )
-
-        print(message.sid)
-        print(message)
