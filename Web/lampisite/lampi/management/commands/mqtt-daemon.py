@@ -13,7 +13,7 @@ MQTT_LAMPI_BROKER_RE_PATTERN = (r'\$sys\/broker\/connection\/'
 MQTT_DOORBELL_BROKER_RE_PATTERN = (r'\$sys\/broker\/connection\/'
                           r'(?P<device_id>[0-9a-f]*)_doorbell_broker/state')
 
-DEVICE_STATE_RE_PATTERN = r'devices\/(?P<device_id>[0-9a-f]*)\/lamp\/changed'
+LAMPI_DEVICE_STATE_RE_PATTERN = r'devices\/(?P<device_id>[0-9a-f]*)\/lamp\/changed'
 
 
 def device_association_topic(device_id, type):
@@ -103,8 +103,10 @@ class Command(BaseCommand):
         topic_lower = message.topic.lower()
         if "_doorbell_broker" in topic_lower:
             results = re.search(MQTT_DOORBELL_BROKER_RE_PATTERN, topic_lower)
+            device_type = "doorbell"
         elif "_lampi_broker" in topic_lower:
             results = re.search(MQTT_LAMPI_BROKER_RE_PATTERN, topic_lower)
+            device_type = "lampi"
         else:
             print("Unknown Device Connecting")
             return
@@ -116,11 +118,12 @@ class Command(BaseCommand):
         else:
             print("DEVICE {} DISCONNECTED".format(device_id))
             connection_state = 'Disconnected'
-        self.mp.track('mqttbridge', "LAMPI {}".format(connection_state),
-                      {'event_type': 'devicemonitoring', 'interface': 'mqtt', 'device_id': device_id})
+        self.mp.track('mqttbridge', "Device {}".format(connection_state),
+                      {'event_type': 'devicemonitoring', 'interface': 'mqtt', 'device_id': device_id,
+                       'type': device_type})
 
     def _monitor_lamp_state(self, client, userdata, message):
-        results = re.search(DEVICE_STATE_RE_PATTERN, message.topic.lower())
+        results = re.search(LAMPI_DEVICE_STATE_RE_PATTERN, message.topic.lower())
         device_id = results.group('device_id')
         event_props = {'event_type': 'devicestate', 'interface': 'mqtt', 'device_id': device_id}
         event_props.update(json.loads(message.payload.decode('utf-8')))

@@ -7,6 +7,7 @@ from uuid import uuid4
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from twilio.rest import Client as TwilioClient
+from mixpanel import Mixpanel
 import speech_recognition as sr
 import json
 import paho.mqtt.publish
@@ -205,7 +206,6 @@ class DoorbellEvent(models.Model):
     transcription = models.TextField()
 
     def transcribe_and_push_notification(self):
-        print("Transcribing")
         text = "No Message"
         try:
             r = sr.Recognizer()
@@ -233,7 +233,7 @@ class DoorbellEvent(models.Model):
             message = client.messages.create(
                 to=user.profile.phone,
                 from_="+16175534108",
-               body=twiliotext
+                body=twiliotext
             )
             print(message.sid)
             print(message)
@@ -241,8 +241,11 @@ class DoorbellEvent(models.Model):
     def send_notification_to_associated_lampis(self):
         try:
             doorbell = self.device_id
-
             links = LampiDoorbellLink.objects.filter(doorbell=doorbell)
+
+            Mixpanel(settings.MIXPANEL_TOKEN).track('mqttbridge', "Doorbell Event",
+                     {'event_type': 'doorbellevent', 'device_id': doorbell.device_id,
+                      'time': self.time, 'number_devices_notified': links.count()})
             if links:
                 for link in links:
                     try:
