@@ -35,6 +35,20 @@ class Lampi: Device {
     override func isConnected() -> Bool {
         return super.isConnected() && hsvCharacteristic != nil && brightnessCharacteristic != nil && onOffCharacteristic != nil
     }
+    
+    override func refresh() {
+        if (devicePeripheral != nil) {
+            if (self.hsvCharacteristic != nil) {
+                devicePeripheral!.readValue(for: self.hsvCharacteristic!)
+            }
+            if (self.brightnessCharacteristic != nil) {
+                devicePeripheral!.readValue(for: self.brightnessCharacteristic!)
+            }
+            if (self.onOffCharacteristic != nil) {
+                devicePeripheral!.readValue(for: self.onOffCharacteristic!)
+            }
+        }
+    }
 }
 
 extension Lampi {

@@ -40,6 +40,10 @@ struct DeviceBroswerView: View {
                         }
                     }
                 }
+                .onAppear(perform: deviceManager.refresh)
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                    deviceManager.refresh()
+                }
             }
         }
     }

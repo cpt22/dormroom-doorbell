@@ -30,6 +30,17 @@ class Doorbell: Device {
     override func isConnected() -> Bool {
         return super.isConnected() && self.associationCodeCharacteristic != nil && self.associationStateCharacteristic != nil
     }
+    
+    override func refresh() {
+        if (devicePeripheral != nil) {
+            if (self.associationStateCharacteristic != nil) {
+                devicePeripheral!.readValue(for: self.associationStateCharacteristic!)
+            }
+            if (self.associationCodeCharacteristic != nil) {
+                devicePeripheral!.readValue(for: self.associationCodeCharacteristic!)
+            }
+        }
+    }
 }
 
 extension Doorbell {

@@ -88,12 +88,12 @@
 				858B9BD42549D7A400A43AC3 /* LampiApp.swift */,
 				8516E5782564479B00E819F6 /* Views */,
 				858B9BE42549E2A000A43AC3 /* Lampi.swift */,
-				8516E57E2564514D00E819F6 /* DeviceManager.swift */,
+				19FAA2422648491700A73B67 /* Device.swift */,
 				19FA6CC526269673007B23AB /* Doorbell.swift */,
+				8516E57E2564514D00E819F6 /* DeviceManager.swift */,
 				858B9BD82549D7A700A43AC3 /* Assets.xcassets */,
 				858B9BDD2549D7A700A43AC3 /* Info.plist */,
 				858B9BDA2549D7A700A43AC3 /* Preview Content */,
-				19FAA2422648491700A73B67 /* Device.swift */,
 			);
 			path = Lampi;
 			sourceTree = "<group>";

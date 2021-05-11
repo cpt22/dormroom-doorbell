@@ -38,12 +38,28 @@ class DeviceManager: NSObject, ObservableObject {
         }
         return false
     }
+    
+    private func allDevices() -> [Device] {
+        var devs = [Device]()
+        for key in devices.keys {
+            if (devices[key] != nil) {
+                devs += Array(devices[key]!.values)
+            }
+        }
+        return devs
+    }
 
     private var bluetoothManager: CBCentralManager!
 
     override init() {
         super.init()
         bluetoothManager = CBCentralManager(delegate: self, queue: nil)
+    }
+    
+    func refresh() {
+        for device in allDevices() {
+            device.refresh()
+        }
     }
 }
 
