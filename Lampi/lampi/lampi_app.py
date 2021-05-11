@@ -10,7 +10,7 @@ from paho.mqtt.client import Client
 import pigpio
 from lamp_common import *
 import lampi.lampi_util
-from kivy.core.window import Window
+import urllib
 
 
 MQTT_CLIENT_ID = "lamp_ui"
@@ -247,6 +247,7 @@ class LampiApp(App):
         interface = "wlan0"
         ipaddr = lampi.lampi_util.get_ip_address(interface)
         deviceid = lampi.lampi_util.get_device_id()
+        internetConnected = self.check_internet_connection()
         msg = "{}: {}\nDeviceID: {}\nBroker Bridged: {}".format(
             interface, ipaddr, deviceid, self.mqtt_broker_bridged)
         instance.content.text = msg
@@ -289,4 +290,11 @@ class LampiApp(App):
         if self._backlight_dimming_timeout is not None:
             self._backlight_dimming_timeout.cancel()
         self._backlight_dimming_timeout = Clock.schedule_once(lambda dt: self.do_dimming(), SCREEN_DIMMING_TIMEOUT)
+
+    def check_internet_connection(self):
+        try:
+            urllib.request.urlopen('http://google.com')  # Python 3.x
+            return True
+        except Exception:
+            return False
 

@@ -23,7 +23,7 @@ GREEN_PIN = 23
 is_internet_connected = False
 
 
-class recorder(threading.Thread):
+class Recorder(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
 
@@ -40,11 +40,11 @@ class recorder(threading.Thread):
         GPIO.output(GREEN_PIN, GPIO.LOW)
         time.sleep(1)
 
-        wu = webUpload(filename, filepath)
+        wu = WebUpload(filename, filepath)
         wu.start()
 
 
-class webUpload(threading.Thread):
+class WebUpload(threading.Thread):
     def __init__(self, filename, filepath):
         threading.Thread.__init__(self)
         self.filename = filename
@@ -122,7 +122,7 @@ def main():
 
 
 def create_recording():
-    thread = recorder()
+    thread = Recorder()
     thread.start()
     return thread
 
