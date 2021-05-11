@@ -1,0 +1,12 @@
+- name: install python3 twilio library
+  become: True
+  apt:
+    name: python3-twilio
+    cache_valid_time: "{{ cache_update_valid_secs }}"
+
+- name: install python3 speech recognition library
+  become: True
+  pip:
+    name: speechrecognition
+    executable: pip3
+    extra_args: --upgrade

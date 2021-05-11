@@ -83,13 +83,11 @@ class ConnectionChecker(threading.Thread):
             time.sleep(1)
 
     def job(self):
-        print("Checking Connection")
         try:
             urllib.request.urlopen('http://google.com')  # Python 3.x
             self.is_connected = True
-        except:
+        except Exception:
             self.is_connected = False
-        print(self.is_connected)
 
 
 def main():
@@ -104,20 +102,21 @@ def main():
 
     thread = None
 
-    conn_checker = ConnectionChecker(500)
+    conn_checker = ConnectionChecker(1000)
     conn_checker.start()
 
     while True:
-        while conn_checker.is_connected:
-            GPIO.output(RED_PIN, GPIO.LOW)
-            if GPIO.event_detected(BUTTON_PIN):
-                print("Button pressed")
-                play_chime()
-                if thread is None or not thread.is_alive():
-                    thread = create_recording()
+        if GPIO.event_detected(BUTTON_PIN):
+            print("Button pressed")
+            if conn_checker.is_connected and (thread is None or not thread.is_alive()):
+                thread = create_recording()
+            play_chime()
 
-        GPIO.output(RED_PIN, GPIO.HIGH)
-        time.sleep(0.1)
+        if conn_checker.is_connected:
+            GPIO.output(RED_PIN, GPIO.LOW)
+        else:
+            GPIO.output(RED_PIN, GPIO.HIGH)
+        time.sleep(0.05)
 
     GPIO.cleanup()
 
