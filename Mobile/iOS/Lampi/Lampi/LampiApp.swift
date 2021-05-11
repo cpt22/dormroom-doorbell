@@ -8,8 +8,7 @@ import Mixpanel
 
 @main
 struct LampiApp: App {
-    #warning("Update MIXPANEL_TOKEN")
-    let MIXPANEL_TOKEN = "INSERT MIXPANEL TOKEN HERE"
+    let MIXPANEL_TOKEN = "40e451024cfbd227ff9de81b39b92b47"
 
     init() {
         Mixpanel.initialize(token: MIXPANEL_TOKEN)
