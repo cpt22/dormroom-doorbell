@@ -6,7 +6,9 @@
 
 - name: install requests python library
   pip:
-    name: requests
+    name:
+      - requests
+      - schedule
     executable: pip3
     extra_args: --upgrade
 

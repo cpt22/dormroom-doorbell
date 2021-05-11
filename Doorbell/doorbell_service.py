@@ -6,6 +6,8 @@ import threading
 import requests
 import RPi.GPIO as GPIO
 import doorbell_util as util
+import schedule
+import urllib.request
 
 #OUTPUT_PATH = "/home/pi/recordings/"
 OUTPUT_PATH = "/tmp/"
@@ -15,7 +17,10 @@ RECORDING_TIME = 5
 UPLOAD_URL = "http://ec2-18-232-7-159.compute-1.amazonaws.com/lampi/api/doorbellevent/"
 
 BUTTON_PIN = 7
-RGB_PINS = [22, 23, 24]
+RED_PIN = 22
+GREEN_PIN = 23
+
+is_internet_connected = False
 
 
 class recorder(threading.Thread):
@@ -30,9 +35,9 @@ class recorder(threading.Thread):
                      OUTPUT_FILETYPE, filepath]
         subprocess.Popen(proc_args, shell=False, preexec_fn=os.setsid)
 
-        GPIO.output(RGB_PINS[1], GPIO.HIGH)
+        GPIO.output(GREEN_PIN, GPIO.HIGH)
         time.sleep(RECORDING_TIME)
-        GPIO.output(RGB_PINS[1], GPIO.LOW)
+        GPIO.output(GREEN_PIN, GPIO.LOW)
         time.sleep(1)
 
         wu = webUpload(filename, filepath)
@@ -63,24 +68,56 @@ class webUpload(threading.Thread):
             print("Could not connect to web server")
 
 
+class ConnectionChecker(threading.Thread):
+    is_connected = False
+
+    def __init__(self, check_time):
+        threading.Thread.__init__(self)
+        self.check_time = check_time / 1000.0
+        self.job()
+
+    def run(self):
+        schedule.every(self.check_time).seconds.do(self.job)
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+
+    def job(self):
+        print("Checking Connection")
+        try:
+            urllib.request.urlopen('http://google.com')  # Python 3.x
+            self.is_connected = True
+        except:
+            self.is_connected = False
+        print(self.is_connected)
+
+
 def main():
-    print("main")
     # Setup GPIO
     GPIO.setmode(GPIO.BOARD)
     GPIO.setwarnings(False)
     GPIO.setup(BUTTON_PIN, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
     GPIO.add_event_detect(BUTTON_PIN, GPIO.RISING, bouncetime=1000)
-    for pin in RGB_PINS:
-        GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
+
+    GPIO.setup(RED_PIN, GPIO.OUT, initial=GPIO.LOW)
+    GPIO.setup(GREEN_PIN, GPIO.OUT, initial=GPIO.LOW)
 
     thread = None
 
+    conn_checker = ConnectionChecker(500)
+    conn_checker.start()
+
     while True:
-        if GPIO.event_detected(BUTTON_PIN):
-            print("Button pressed")
-            play_chime()
-            if thread is None or not thread.is_alive():
-                thread = create_recording()
+        while conn_checker.is_connected:
+            GPIO.output(RED_PIN, GPIO.LOW)
+            if GPIO.event_detected(BUTTON_PIN):
+                print("Button pressed")
+                play_chime()
+                if thread is None or not thread.is_alive():
+                    thread = create_recording()
+
+        GPIO.output(RED_PIN, GPIO.HIGH)
+        time.sleep(0.1)
 
     GPIO.cleanup()
 

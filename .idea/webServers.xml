@@ -17,7 +17,13 @@
         </fileTransfer>
       </webServer>
       <webServer id="46bbe17c-b033-4ddd-9549-4b1a987ed994" name="doorbell1" url="http:///">
-        <fileTransfer accessType="SFTP" host="doorbell" port="22" sshConfigId="4f992f60-6992-4b71-9f80-a4668bbf7293" sshConfig="pi@doorbell:22 agent" authAgent="true" />
+        <fileTransfer accessType="SFTP" host="doorbell" port="22" sshConfigId="7c4eb7f3-71c1-4f44-b684-0fd1380ac5d5" sshConfig="pi@doorbell:22 agent" authAgent="true" />
+      </webServer>
+      <webServer id="58e89f3a-8ad0-4174-99a0-542b31a894da" name="doorbell" url="http:///">
+        <fileTransfer accessType="SFTP" host="doorbell" port="22" sshConfigId="7c4eb7f3-71c1-4f44-b684-0fd1380ac5d5" sshConfig="pi@doorbell:22 agent" authAgent="true" />
+      </webServer>
+      <webServer id="24c18488-4d83-4b24-a27c-edcea1198501" name="doorbell2" url="http:///">
+        <fileTransfer accessType="SFTP" host="doorbell" port="22" sshConfigId="7c4eb7f3-71c1-4f44-b684-0fd1380ac5d5" sshConfig="pi@doorbell:22 agent" authAgent="true" />
       </webServer>
     </option>
   </component>

@@ -15,6 +15,27 @@
           </excludedPaths>
         </serverdata>
       </paths>
+      <paths name="doorbell">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/pi/lampi-ecosystem" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="doorbell1">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/pi/lampi-ecosystem" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="doorbell2">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/pi/lampi-ecosystem" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="lampi-final">
         <serverdata>
           <mappings>
