@@ -8,6 +8,7 @@
 import Foundation
 import CoreBluetooth
 import Combine
+import Mixpanel
 
 class Device: NSObject, ObservableObject {
     @Published var wifiState = WifiState()
@@ -55,6 +56,10 @@ class Device: NSObject, ObservableObject {
     
     public func isConnected() -> Bool {
         return self.ssidCharacteristic != nil && self.pskCharacteristic != nil && self.wifiUpdateCharacteristic != nil && managerConnected
+    }
+    
+    public func refresh() {
+        
     }
 }
 
@@ -118,7 +123,6 @@ extension Device {
 
 extension Device: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
-        //preconditionFailure("This method must be overridden")
         guard let services = peripheral.services else { return }
         
         for service in services {
@@ -131,7 +135,6 @@ extension Device: CBPeripheralDelegate {
     }
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
-        //preconditionFailure("This method must be overridden")
         guard let characteristics = service.characteristics else { return }
         
         for characteristic in characteristics {
@@ -160,8 +163,14 @@ extension Device: CBPeripheralDelegate {
             case Device.WIFI_UPDATE_UUID:
                 if (parseBoolean(for: updatedValue)) {
                     wifiState.wifiResponse = "WiFi Updated"
+                    wifiState.ssid = ""
+                    wifiState.psk = ""
+                    Mixpanel.mainInstance().trackUIEvent("WiFi Configuration Change",
+                                                         properties: ["status":"success"])
                 } else {
                     wifiState.wifiResponse = "Error in WiFi configuration!"
+                    Mixpanel.mainInstance().trackUIEvent("WiFi Configuration Change",
+                                                         properties: ["status":"failure"])
                 }
                 break
             default:

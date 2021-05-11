@@ -9,8 +9,6 @@ import Foundation
 import SwiftUI
 import Mixpanel
 
-
-
 struct DoorbellView: View {
     @ObservedObject var doorbell: Doorbell
     
@@ -56,9 +54,11 @@ struct DoorbellView: View {
                     .shadow(radius: 2.0)
             })
             .navigationBarTitle("Doorbell Setup", displayMode: .inline)
+            .onAppear(perform: doorbell.refresh)
+            .onReceive(NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                doorbell.refresh()
+            }
     }
-    
-    
 }
 
 struct DoorbellView_Preview: PreviewProvider{

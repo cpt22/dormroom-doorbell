@@ -7,6 +7,7 @@
 
 import Foundation
 import SwiftUI
+import Mixpanel
 
 struct WifiSettingsView: View {
     @ObservedObject var device: Device
@@ -20,11 +21,13 @@ struct WifiSettingsView: View {
                     Text("SSID:")
                         .padding()
                     TextField("SSID", text: $device.wifiState.ssid)
+                        .disableAutocorrection(true)
                 }
                 HStack {
                     Text("Password:")
                         .padding()
-                    TextField("Password", text: $device.wifiState.psk)
+                    SecureField("Password", text: $device.wifiState.psk)
+                        .disableAutocorrection(true)
                 }
                 Text(device.wifiState.wifiResponse)
                 
