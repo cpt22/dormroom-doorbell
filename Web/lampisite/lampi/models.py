@@ -97,6 +97,9 @@ class Lampi(models.Model):
         assoc_msg['associated'] = False
         assoc_msg['code'] = self.association_code
         send_association_message(self.type, self.device_id, assoc_msg)
+        self.mp.track(self.user.username, "LAMPI Dissociation",
+                      {'event_type': 'dissociation', 'device_id': self.device_id,
+                       'associated': False})
 
     def associate_and_publish_associated_msg(self, user):
         # update Lampi instance with new user
@@ -148,6 +151,9 @@ class Doorbell(models.Model):
         assoc_msg['associated'] = False
         assoc_msg['code'] = self.association_code
         send_association_message(self.type, self.device_id, assoc_msg)
+        self.mp.track(self.user.username, "Doorbell Dissociation",
+                      {'event_type': 'dissociation', 'device_id': self.device_id,
+                       'associated': False})
 
     def associate_and_publish_associated_msg(self, user):
         # update Doorbell instance with new user
