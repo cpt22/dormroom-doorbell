@@ -258,7 +258,7 @@ class DoorbellEvent(models.Model):
             links = LampiDoorbellLink.objects.filter(doorbell=doorbell)
 
             Mixpanel(settings.MIXPANEL_TOKEN).track('mqttbridge', "Doorbell Event",
-                                                    {'event_type': 'doorbellevent', 'device_id': doorbell.doorbell,
+                                                    {'event_type': 'doorbellevent', 'device_id': doorbell.device_id,
                                                      'time': self.time, 'number_devices_notified': links.count()})
             if links:
                 for link in links:
@@ -273,7 +273,7 @@ class DoorbellEvent(models.Model):
                             'num_flashes': link.number_flashes,
                         }
                         paho.mqtt.publish.single(
-                            generate_lamp_notification_topic(link.lampi.doorbell, 'lamp'),
+                            generate_lamp_notification_topic(link.lampi.device_id, 'lamp'),
                             json.dumps(notification_message),
                             qos=2,
                             retain=False,

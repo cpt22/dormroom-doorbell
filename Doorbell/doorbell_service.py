@@ -53,7 +53,7 @@ class WebUpload(threading.Thread):
     def run(self):
         try:
             print("Sending file to server")
-            data = {'filename': self.filename, 'device_id': util.get_device_id()}
+            data = {'filename': self.filename, 'doorbell': util.get_device_id()}
             files = {'recording': (open(self.filepath, 'rb'))}
             response = requests.post(UPLOAD_URL,
                                      data=data,
@@ -63,6 +63,7 @@ class WebUpload(threading.Thread):
             elif response.status_code == 404:
                 print("Not Found")
             else:
+                print(response.status_code)
                 print("Other Error")
         except OSError as e:
             print("Could not connect to web server")
