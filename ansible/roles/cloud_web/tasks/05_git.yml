@@ -4,6 +4,12 @@
     name: git
     cache_valid_time: "{{ cache_update_valid_secs }}"
 
+- name: make sure twilio is installed
+  become: yes
+  apt:
+    name: python3-twilio
+    cache_valid_time: "{{ cache_update_valid_secs }}"
+
 - name: install our repo
   become: no # need to explicitly do this to allow SSH host key forwarding
   git:

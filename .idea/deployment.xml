@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" autoUpload="Always" serverName="doorbell1" remoteFilesAllowedToDisappearOnAutoupload="false">
+  <component name="PublishConfigData" serverName="doorbell1" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
       <paths name="cloud-final">
         <serverdata>
@@ -13,13 +13,6 @@
             <excludedPath local="true" path="$PROJECT_DIR$/Lampi" />
             <excludedPath local="true" path="$PROJECT_DIR$/Mobile" />
           </excludedPaths>
-        </serverdata>
-      </paths>
-      <paths name="doorbell1">
-        <serverdata>
-          <mappings>
-            <mapping deploy="/home/pi/lampi-ecosystem" local="$PROJECT_DIR$" web="/" />
-          </mappings>
         </serverdata>
       </paths>
       <paths name="lampi-final">
@@ -36,6 +29,5 @@
         </serverdata>
       </paths>
     </serverData>
-    <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>

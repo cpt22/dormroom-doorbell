@@ -3,10 +3,15 @@ from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from uuid import uuid4
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from twilio.rest import Client
 import speech_recognition as sr
 import json
 import paho.mqtt.publish
 import colorsys
+import threading
+from .keys import *
 
 # Create your models here.
 DEFAULT_USER = 'parked_device_user'
@@ -19,11 +24,14 @@ def get_parked_user():
 def generate_association_code():
     return uuid4().hex
 
+
 def generate_lamp_notification_topic(device_id, type):
     return 'devices/{}/{}/notification'.format(device_id, type)
 
+
 def generate_device_association_topic(type, device_id):
     return 'devices/{}/{}/associated'.format(device_id, type)
+
 
 def send_association_message(type, device_id, message):
     paho.mqtt.publish.single(
@@ -34,6 +42,22 @@ def send_association_message(type, device_id, message):
         hostname="localhost",
         port=50001,
     )
+
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.profile.save()
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    phone = models.CharField(max_length=12, blank=True)
 
 
 class Lampi(models.Model):
@@ -57,7 +81,7 @@ class Lampi(models.Model):
         }
         return dct
 
-    #def _generate_device_association_topic(self):
+    # def _generate_device_association_topic(self):
     #    return 'devices/{}/lamp/associated'.format(self.device_id)
     def dissociate(self):
         self.user = get_parked_user()
@@ -74,8 +98,7 @@ class Lampi(models.Model):
         assoc_msg['code'] = self.association_code
         send_association_message(self.type, self.device_id, assoc_msg)
 
-
-    def associate_and_publish_associated_msg(self,  user):
+    def associate_and_publish_associated_msg(self, user):
         # update Lampi instance with new user
         self.user = user
         self.save()
@@ -120,7 +143,7 @@ class Doorbell(models.Model):
         assoc_msg['code'] = self.association_code
         send_association_message(self.type, self.device_id, assoc_msg)
 
-    def associate_and_publish_associated_msg(self,  user):
+    def associate_and_publish_associated_msg(self, user):
         # update Doorbell instance with new user
         self.user = user
         self.save()
@@ -162,12 +185,12 @@ class LampiDoorbellLink(models.Model):
         print("here")
         print(self.doorbell.to_dict())
         dct = {'doorbell': self.doorbell.to_dict(),
-                'lampi': self.lampi.to_dict(),
-                'hue': float(self.hue),
-                'saturation': float(self.saturation),
-                'brightness': float(self.brightness),
-                'hex_color': self.hex_color,
-                'number_flashes': self.number_flashes}
+               'lampi': self.lampi.to_dict(),
+               'hue': float(self.hue),
+               'saturation': float(self.saturation),
+               'brightness': float(self.brightness),
+               'hex_color': self.hex_color,
+               'number_flashes': self.number_flashes}
         return dct
 
     def hex_to_rgb(self, value):
@@ -201,10 +224,26 @@ class DoorbellEvent(models.Model):
         self.save()
         self.send_notification_to_associated_lampis()
 
+        user = self.device_id.user
+        if user is not get_parked_user() and user.profile.phone:
+            twiliotext = self.device_id.name + ": " + self.transcription
+            print("Running twilio messenger")
+            client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+            print("Sending message to: " + user.profile.phone)
+            message = client.messages.create(
+                to=user.profile.phone,
+                from_="+16175534108",
+                body=twiliotext
+            )
+            print(message.sid)
+            print(message)
+            #tm = TwilioMessenger(user.profile.phone, twiliotext)
+            #tm.start()
+
     def send_notification_to_associated_lampis(self):
         try:
             doorbell = self.device_id
-            lampis = doorbell.lampis.all()
+
             links = LampiDoorbellLink.objects.filter(doorbell=doorbell)
             if links:
                 for link in links:
@@ -230,31 +269,25 @@ class DoorbellEvent(models.Model):
                         print("missing lampi or something")
             else:
                 print("No associated lampis")
-            # if lampis:
-            #     for lampi in lampis:
-            #         try:
-            #             link = LampiDoorbellLink.objects.get(doorbell=doorbell, lampi=lampi)
-            #
-            #             notification_message = {
-            #                 'type': 'doorbell_event',
-            #                 'title': doorbell.name,
-            #                 'message': self.transcription,
-            #                 'hue': float(link.hue),
-            #                 'saturation': float(link.saturation),
-            #                 'brightness': float(link.brightness),
-            #                 'num_flashes': link.number_flashes,
-            #             }
-            #             paho.mqtt.publish.single(
-            #                 generate_lamp_notification_topic(lampi.device_id, 'lamp'),
-            #                 json.dumps(notification_message),
-            #                 qos=2,
-            #                 retain=False,
-            #                 hostname="localhost",
-            #                 port=50001,
-            #             )
-            #         except LampiDoorbellLink.DoesNotExist:
-            #             print("missing lampi or something")
-            # else:
-            #     print("No associated lampis")
         except Doorbell.DoesNotExist:
             print("Error finding doorbell")
+
+
+class TwilioMessenger(threading.Thread):
+    def __init__(self, destination, text):
+        threading.Thread.__init__(self)
+        self.destination = destination
+        self.text = text
+
+    def run(self):
+        print("Running twilio messenger")
+        client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+        print("Sending message to: " + self.destination)
+        message = client.messages.create(
+            to=self.destination,
+            from_="+16175534108",
+            body=self.text
+        )
+
+        print(message.sid)
+        print(message)
