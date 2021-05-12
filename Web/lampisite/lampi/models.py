@@ -140,9 +140,10 @@ class Doorbell(models.Model):
     def dissociate(self):
         self.user = get_parked_user()
         self.association_code = generate_association_code()
+        self.lampis.clear()
+        self.events.all().delete()
         self.save()
         self.publish_unassociated_msg()
-        self.events.all().delete()
         self.mp.track(self.user.username, "Dissociation",
                       {'event_type': 'dissociation', 'device_id': self.device_id,
                        'device_type': 'doorbell'})
